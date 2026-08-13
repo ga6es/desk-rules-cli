@@ -50,8 +50,13 @@ if (JSON.stringify(actualFiles) !== JSON.stringify(expectedFiles)) {
 }
 
 for (const entry of manifest.files) {
-  const bytes = readFileSync(join(root, entry.path))
-  const digest = createHash("sha256").update(bytes).digest("hex")
+  const normalizedText = readFileSync(join(root, entry.path), "utf8").replaceAll(
+    "\r\n",
+    "\n",
+  )
+  const digest = createHash("sha256")
+    .update(normalizedText, "utf8")
+    .digest("hex")
   if (digest !== entry.sha256) {
     throw new Error(`${entry.path} does not match its export fingerprint.`)
   }

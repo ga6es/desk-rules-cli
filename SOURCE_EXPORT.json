@@ -70,11 +70,11 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
-      "sha256": "f716eb153a8ab321c14213db26c4c3877cbfee4ab5d3a408172c416dd049bdea"
+      "sha256": "7660b6bbf608a08436ba6ae43b43226340bfdd13d6fbb352092210884a269b9a"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/export-and-publish.md",
-      "sha256": "a064f98701d435795413206694756564d2eb8b92e55bfff2c9b6ba3c6405b437"
+      "sha256": "59cfd6afd137f6afe88a923f1082e9424f15b2a47830346ef17106e5b430bbcf"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/first-safe-check.md",
@@ -86,15 +86,15 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
-      "sha256": "0d3d097ab5e0433a521b653ed56a756ae12dbd74e98319f18656204709abbcdf"
+      "sha256": "8a1615ef8dca29d5b2ad7d99e74fb58c089601057a6544ee3c9be15d4937d1c2"
     },
     {
       "path": "package/src/codex-config-repair.ts",
-      "sha256": "745e45bbdb57c19560c576ddfa1f4883af385ffb55fad51ad8f448f177064d2a"
+      "sha256": "2b6584368d4810cec5a0b18fe76904ff081a76a4cde9d389d4fa7dd198b65f16"
     },
     {
       "path": "package/src/index.ts",
-      "sha256": "353a7ab9293bdc3edc1dbb3af56a4dd34550a02963ebb26756e310543884e31e"
+      "sha256": "62ae08248aa097df059610ea6f1605745ef5d99780190490b797e26f78bb5f65"
     },
     {
       "path": "package/src/manifest.ts",
@@ -102,11 +102,11 @@
     },
     {
       "path": "package/src/oauth-metadata.ts",
-      "sha256": "f7ebb5202e087abb5ccf594c9711041affe9b69344e52885bd62f4aa6d7d7042"
+      "sha256": "a07cabc5b31df105ae11ccdedf1316e5432073939dd663fc0e7d01843d1d48e4"
     },
     {
       "path": "package/tsconfig.json",
-      "sha256": "f9ba27b10b4be3d461f0fc422c12dadef9e7ee6ab8acc3e75c1997a0a41b1728"
+      "sha256": "d30981ea41a52829f5c4b403a2c14f80069b40eb9a8a701cc73eeb3f666e8531"
     },
     {
       "path": "scripts/check-package.mjs",
@@ -114,7 +114,7 @@
     },
     {
       "path": "scripts/verify-export.mjs",
-      "sha256": "c12566fc2a32acb5a60195bf4e7fbb4b59fb6231e87a7a28298b81d9b0797527"
+      "sha256": "80046846f6cb15c979441aaa9d7dd73938d3b04d4929c087d0813010e3a3f678"
     },
     {
       "path": "tests/cli.test.ts",
@@ -123,7 +123,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "73663403a08aa6a08adf6deb69340c2631726408",
+    "commit": "623a61eb15b037f4580dd20942119441b00da21b",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
