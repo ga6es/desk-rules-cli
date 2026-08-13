@@ -1,0 +1,63 @@
+name: CLI CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify public CLI source
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+
+      - name: Setup Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 24.15.0
+          package-manager-cache: false
+
+      - name: Verify source export fingerprint
+        run: npm run check:export
+
+      - name: Verify repository license
+        run: test -f LICENSE && test -f NOTICE
+
+      - name: Install exact dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test behavior
+        run: npm test
+
+      - name: Verify package contract
+        run: npm run check:package
+
+      - name: Inspect package contents
+        run: npm run check:package-contents
+
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Generate CycloneDX SBOM
+        run: npm run sbom --silent > desk-rules-cli.cdx.json
+
+      - name: Verify clean tracked tree
+        run: git diff --check
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: desk-rules-cli-sbom
+          path: desk-rules-cli.cdx.json
+          if-no-files-found: error

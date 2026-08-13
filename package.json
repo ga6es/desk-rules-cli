@@ -1,0 +1,22 @@
+{
+  "name": "desk-rules-cli-public-workspace",
+  "version": "0.1.8",
+  "private": true,
+  "workspaces": [
+    "package"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @desk-rules/cli",
+    "check": "npm run check:export && npm run build && npm test && npm run check:package && npm run check:package-contents",
+    "check:export": "node scripts/verify-export.mjs",
+    "check:package": "node scripts/check-package.mjs",
+    "check:package-contents": "npm pack --dry-run --json --workspace @desk-rules/cli",
+    "sbom": "npm sbom --workspace @desk-rules/cli --sbom-format cyclonedx",
+    "test": "node --import tsx --test tests/*.test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.37",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}
