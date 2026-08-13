@@ -1,0 +1,130 @@
+{
+  "files": [
+    {
+      "path": ".github/CODEOWNERS",
+      "sha256": "2f11dd430182ddd7a6b8467f7ad94dd43059277230a2d9b3923185ed6dd6b76a"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "sha256": "06c866a85cd0a1c3d033f0d3774ae43993506bca4984d095de7e6ab53cac95c6"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "sha256": "5dcc640e4ceb5d32c1b5c11fa2cdf780116c64def5684c4127053949e497eecf"
+    },
+    {
+      "path": ".github/workflows/publish.yml",
+      "sha256": "ba16d793931c269672ab1b66f1e33f44591cd1d0ed0c4967a4ea31995509d4a2"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "bdeffa715ce8c10418099b6cd4ecddd9589a84c512b56ba44f73c4d805b9be0b"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "ec80ee3a99c0699f23cfa3892bf59ecde1d773ab48f90ccd2a17931074845ce2"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "f0f329beba063855c23d1b5db41e87f5281a8291a1f7436dc766eeb93710cf50"
+    },
+    {
+      "path": "NOTICE",
+      "sha256": "f22f2e250109d609e94770868b7a96a60a60a9915dac8d245a45d1df9d5f955e"
+    },
+    {
+      "path": "README.md",
+      "sha256": "c944a55df31f5b95257c345c88d8fc47de293e1efc195306ecaa044d4bc3b1f0"
+    },
+    {
+      "path": "SECURITY.md",
+      "sha256": "f93ad6858e0b0978439dd95ad4faf127d1154738c6862b61dac5de43efcb4711"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "0973ba4bc43b8a611c22b2537400e1160e865015cbb10c50d5d704dcd582b0f3"
+    },
+    {
+      "path": "package.json",
+      "sha256": "ff753d228856f7de6d4cd777a385d8894edb9cc11d34a4141cd23ec5387cce71"
+    },
+    {
+      "path": "package/LICENSE",
+      "sha256": "f0f329beba063855c23d1b5db41e87f5281a8291a1f7436dc766eeb93710cf50"
+    },
+    {
+      "path": "package/NOTICE",
+      "sha256": "f22f2e250109d609e94770868b7a96a60a60a9915dac8d245a45d1df9d5f955e"
+    },
+    {
+      "path": "package/README.md",
+      "sha256": "f11c05d2880878b7ab6e0f62d71d824fa9d58484d579667e2be37d62670b8262"
+    },
+    {
+      "path": "package/package.json",
+      "sha256": "8417c704076f4bc0b03a962cfd217e4489a53aa5a96aca49fe59f3877ba8d336"
+    },
+    {
+      "path": "package/skills/desk-rules-mcp/SKILL.md",
+      "sha256": "88a5b13407b90f144a851b29bcc5d046d47c1456fe85cfee89321e7850c98831"
+    },
+    {
+      "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
+      "sha256": "f716eb153a8ab321c14213db26c4c3877cbfee4ab5d3a408172c416dd049bdea"
+    },
+    {
+      "path": "package/skills/desk-rules-mcp/playbooks/export-and-publish.md",
+      "sha256": "a064f98701d435795413206694756564d2eb8b92e55bfff2c9b6ba3c6405b437"
+    },
+    {
+      "path": "package/skills/desk-rules-mcp/playbooks/first-safe-check.md",
+      "sha256": "dfa1da9a3c26a46f215e9bf27f2fd17055ff02889063667762605277d82bb4c4"
+    },
+    {
+      "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
+      "sha256": "8c590b3b7d7de5f6cc57dfd824299e7cb69d3cce105fedff4a17493be5a446ae"
+    },
+    {
+      "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
+      "sha256": "0d3d097ab5e0433a521b653ed56a756ae12dbd74e98319f18656204709abbcdf"
+    },
+    {
+      "path": "package/src/codex-config-repair.ts",
+      "sha256": "745e45bbdb57c19560c576ddfa1f4883af385ffb55fad51ad8f448f177064d2a"
+    },
+    {
+      "path": "package/src/index.ts",
+      "sha256": "353a7ab9293bdc3edc1dbb3af56a4dd34550a02963ebb26756e310543884e31e"
+    },
+    {
+      "path": "package/src/manifest.ts",
+      "sha256": "7c6a4b86943c946948f093cf930e51e021c4ea1b224f462a2987d84dc6610ffb"
+    },
+    {
+      "path": "package/src/oauth-metadata.ts",
+      "sha256": "f7ebb5202e087abb5ccf594c9711041affe9b69344e52885bd62f4aa6d7d7042"
+    },
+    {
+      "path": "package/tsconfig.json",
+      "sha256": "f9ba27b10b4be3d461f0fc422c12dadef9e7ee6ab8acc3e75c1997a0a41b1728"
+    },
+    {
+      "path": "scripts/check-package.mjs",
+      "sha256": "5e55b13d472d2e404209c690478d616adfb2a8614f93f489296add7e71995eed"
+    },
+    {
+      "path": "scripts/verify-export.mjs",
+      "sha256": "c12566fc2a32acb5a60195bf4e7fbb4b59fb6231e87a7a28298b81d9b0797527"
+    },
+    {
+      "path": "tests/cli.test.ts",
+      "sha256": "4dfeac824d438b30728133a7605d4add55cb4805723909779819e7cfb410751e"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "commit": "73663403a08aa6a08adf6deb69340c2631726408",
+    "repository": "ga6es/desk-rules",
+    "root": "packages/cli"
+  }
+}

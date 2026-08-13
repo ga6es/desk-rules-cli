@@ -1,0 +1,48 @@
+{
+  "name": "@desk-rules/cli",
+  "version": "0.1.8",
+  "description": "Desk Rules MCP setup, diagnostics, and update guidance.",
+  "type": "module",
+  "private": false,
+  "homepage": "https://deskrules.com/docs/mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ga6es/desk-rules-cli.git",
+    "directory": "package"
+  },
+  "bugs": {
+    "url": "https://github.com/ga6es/desk-rules-cli/issues"
+  },
+  "keywords": [
+    "desk-rules",
+    "mcp",
+    "cli",
+    "codex",
+    "claude"
+  ],
+  "bin": {
+    "deskrules": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "package.json",
+    "skills/desk-rules-mcp"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepack": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "smol-toml": "1.7.1"
+  }
+}
