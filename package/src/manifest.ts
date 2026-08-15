@@ -15,8 +15,8 @@ export const DESK_RULES_MCP_SERVER_MANIFEST = {
     npmPackageStatus: "published",
     npmPersistentInstallCommand: "npm install -g @desk-rules/cli",
     npmRunCommand: "npm exec @desk-rules/cli@latest --",
-    preparedVersion: "0.1.8",
-    publishedVersion: "0.1.7",
+    preparedVersion: "0.1.9",
+    publishedVersion: "0.1.8",
     standaloneBinaryStatus: "planned",
   },
   compatibility: {
@@ -126,7 +126,7 @@ export const DESK_RULES_MCP_SERVER_MANIFEST = {
     pricing: "/pricing",
     providerConnections: "/account/apps",
   },
-  manifestVersion: "2026-08-11.news-board-lists-v1",
+  manifestVersion: "2026-08-14.activity-signals-v1",
   plugin: {
     codexMarketplaceStatus: "private-preview",
     packageName: "desk-rules-mcp",

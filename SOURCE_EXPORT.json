@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "0973ba4bc43b8a611c22b2537400e1160e865015cbb10c50d5d704dcd582b0f3"
+      "sha256": "59f944373e5c7ca44f50ff9ab23d51739df85d2c60c152593dfe6ab7948b7002"
     },
     {
       "path": "package.json",
@@ -58,15 +58,15 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "f11c05d2880878b7ab6e0f62d71d824fa9d58484d579667e2be37d62670b8262"
+      "sha256": "f723a639c99d6e97b464625a30ed7dcaaf8a140ad2a763828a959dbc598b4d70"
     },
     {
       "path": "package/package.json",
-      "sha256": "8417c704076f4bc0b03a962cfd217e4489a53aa5a96aca49fe59f3877ba8d336"
+      "sha256": "baa06d8bc2b41204d5668abf196bb19e053fca2c3fb7c84d35f6275a84401a3a"
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "88a5b13407b90f144a851b29bcc5d046d47c1456fe85cfee89321e7850c98831"
+      "sha256": "184bdc95957857d631b71570aa89805ba2850d3a7fe734fd2044ffd862539d89"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
@@ -82,7 +82,7 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
-      "sha256": "8c590b3b7d7de5f6cc57dfd824299e7cb69d3cce105fedff4a17493be5a446ae"
+      "sha256": "e4132ed496fc4bc34f094ff3e766299fced32001ea0a0a0fefc9f2a47156bc50"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
@@ -98,7 +98,7 @@
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "7c6a4b86943c946948f093cf930e51e021c4ea1b224f462a2987d84dc6610ffb"
+      "sha256": "b32229d1f14e7a2ea74e88083218f25a8425e5429b7a8533ab6c0d6c0ba625da"
     },
     {
       "path": "package/src/oauth-metadata.ts",
@@ -110,7 +110,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "5e55b13d472d2e404209c690478d616adfb2a8614f93f489296add7e71995eed"
+      "sha256": "69320d68f5553340a352a192381eed428d8809f86b0fad3fe8715f15909adc08"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -118,12 +118,12 @@
     },
     {
       "path": "tests/cli.test.ts",
-      "sha256": "4dfeac824d438b30728133a7605d4add55cb4805723909779819e7cfb410751e"
+      "sha256": "9405a3ccf01f5d598113664c10d839b6a4e4f43dd59ca646ffbd6e027d36a4a5"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "623a61eb15b037f4580dd20942119441b00da21b",
+    "commit": "30f1544b577ee69984752e30695ff2419040727d",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

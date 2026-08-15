@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs"
 
 const metadata = JSON.parse(readFileSync("package/package.json", "utf8"))
 assert.equal(metadata.name, "@desk-rules/cli")
-assert.equal(metadata.version, "0.1.8")
+assert.equal(metadata.version, "0.1.9")
 assert.equal(metadata.license, "Apache-2.0")
 assert.equal(metadata.repository.url, "git+https://github.com/ga6es/desk-rules-cli.git")
 assert.equal(metadata.repository.directory, "package")
