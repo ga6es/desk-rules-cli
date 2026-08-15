@@ -73,12 +73,10 @@ template validation, and draft creation. Copied title-and-URL requests are
 resolved through bounded News Board story discovery before inspection.
 Deterministic `signalNotes` are first-read prioritization hints for story lists
 and target discovery; they are statistics-derived labels, not verification or
-research conclusions. `Hot` and `Rising` are gated News Board destination
-signals for top-10 lane placements with lower-lane evidence, not claims about
-Reddit's ranking algorithm. When `Hot` qualifies, it suppresses `Rising`.
-Conversation spike, Early traction, and High engagement are bounded
-recent-post hints whose volume thresholds adjust by subreddit audience size when
-subscriber metadata is available; unknown subscriber counts use fixed fallback
+research conclusions. Hot, New, and Rising remain factual Reddit lanes and
+rank labels, not signal notes. Conversation spike, Early traction, and High
+engagement are bounded recent-post hints whose thresholds scale by subreddit
+audience size; missing subscriber metadata uses fixed deterministic fallback
 thresholds. A strict Desk Rules MCP-only test cannot complete external research.
 
 News Board Add Feed distinguishes provider-backed sources from repeatable
@@ -106,6 +104,16 @@ with `inspect_news_board_lists`, use the five idempotent List write tools only
 with Read & write authorization, and copy returned `addFeedConfig` values into
 `add_news_board_feed`. The CLI provides discovery and distribution parity but
 does not add standalone List commands.
+
+When a story's Comments Rule requires direct Reddit evidence, the connected
+agent uses its permitted web, search, or browser tools to inspect the public
+Reddit thread and comments. It cites only directly observed excerpts with
+canonical comment permalinks and treats the bounded sample as evidence, not
+community consensus. If direct inspection is unavailable, the agent provides
+`qualityEvidence.comments` with `status: "blocked"` and a specific note. A saved
+Caveat may additionally describe the limitation, but does not satisfy the
+Comments requirement. The agent never fabricates comments or relies on model
+memory.
 
 `deskrules mcp test` is a token-free endpoint preflight, not proof of an
 authenticated workspace session. Maintainers use

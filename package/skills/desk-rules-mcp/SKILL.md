@@ -72,8 +72,24 @@ Operate Desk Rules MCP through the hosted endpoint
     Use Reddit momentum, rank placements, and lane evidence only as bounded
     secondary context after inspecting the story; do not recompute rank or
     velocity math in the agent.
+11. When the returned Comments Rule or `researchQualityRequirements` requires
+    direct Reddit comment evidence, use the connected agent's permitted web,
+    search, or browser tools to inspect the public Reddit thread and comments.
+    Cite only directly observed excerpts with canonical Reddit comment
+    permalinks and available author, score, and observation context. If the host
+    cannot inspect the thread, Reddit blocks access, or canonical permalinks
+    cannot be verified, provide `qualityEvidence.comments` with
+    `status: "blocked"` and a specific note. A saved Caveat may additionally
+    describe the limitation, but does not satisfy the Comments requirement. Do
+    not invent comments, rely on model memory, or infer community consensus.
+    Before saving, read `researchCommentContract`: use at most five
+    comments, keep excerpts within 1,000 characters, and assign each comment one
+    distinct representative type from `most_upvoted`,
+    `skeptical_or_fake_news`, `fact_checking`, `supportive`, or
+    `clarifying_or_context`. Do not coerce, discard, or relabel a comment to make
+    validation pass.
 
-11. Build `save_news_board_story_research` from `story`, `expectedUpdatedAt`,
+12. Build `save_news_board_story_research` from `story`, `expectedUpdatedAt`,
    `packageFingerprint`, `rulesFingerprint`, `researchResult`, optional
    `qualityEvidence`, optional `researchMarkdown`, and optional
    `storyDisplaySnapshot`. Use `researchTarget`, `storyDisplaySnapshot`, and
@@ -85,13 +101,15 @@ Operate Desk Rules MCP through the hosted endpoint
    retry. `qualityEvidence` is transient validation input, not saved research
    JSON. Use it only for bounded blocked/not_applicable evidence when a
    returned research quality requirement cannot be satisfied.
-12. Use `save_news_board_story_research_section` only after inspecting an
+13. Use `save_news_board_story_research_section` only after inspecting an
     existing saved package when one section needs a targeted correction. Build
     it from `story`, `expectedUpdatedAt`, `packageFingerprint`,
     `rulesFingerprint`, `sectionId`, `section`, optional `qualityEvidence`,
     optional `researchMarkdown`, and optional `storyDisplaySnapshot`. Omit
     `storyDisplaySnapshot` to preserve current package display metadata. Do not
-    use it to create the first saved package.
+    use it to create the first saved package. If current Rules make the targeted
+    save impossible without changing another section, report the blocker rather
+    than broadening the update.
 
 ## Signal Feeds And Feed Configs
 
@@ -106,8 +124,8 @@ News Board has two feed classes:
   name snapshot; copy that config from inspection instead of guessing it.
 
 The signal feed selectors are `all_signals`, `conversation_spike`,
-`high_engagement`, `early_traction`, `reached_hot`, `reached_rising`,
-`fast_climb`, and `cooling`. `all_signals` is a feed-only selector that
+`high_engagement`, `early_traction`, `fast_climb`, and `cooling`.
+`all_signals` is a feed-only selector that
 matches any current canonical signal note. It is not a
 `NewsBoardStorySignalNoteKind` and must not be presented as a thresholded
 story signal.
@@ -168,22 +186,22 @@ distinct board columns that share one canonical request identity.
   precedence.
 - `Fast climb`: recently moved up at least 5 ranks, or rank delta is at least
   5 in a short metrics window.
-- `Hot`: reached a top-10 Hot placement within 6 hours with lower-lane
-  evidence; when Hot qualifies, do not also treat the story as Rising.
-- `Rising`: reached a top-10 Rising placement within 3 hours with New evidence,
-  only when Hot does not qualify.
-- `Conversation spike`: comment momentum whose new-comment or
+- `Conversation spike`: comment activity whose new-comment or
   comments-per-hour thresholds scale by subreddit audience size when subscriber
   metadata is available.
-- `Early traction`: under 45 minutes old with comments, score, or comment
+- `Early traction`: no more than 45 minutes old with comments, score, or comment
   velocity that clears the subreddit's audience tier.
-- `High engagement`: score growth or score-per-hour momentum that clears the
+- `High engagement`: score growth or score-per-hour activity that clears the
   subreddit's audience tier, with a usable upvote ratio.
 
 These definitions describe the current product thresholds. Treat the
 server-owned News Board metrics code as the canonical source of truth. The
 human-readable threshold table lives in `docs/news-board-signal-thresholds.md`;
 missing subscriber metadata uses the fixed fallback thresholds described there.
+Hot, New, and Rising remain factual Reddit lanes and rank labels; they are not
+signal notes or signal-feed selectors. Treat every signal as a prioritization
+hint, not sentiment, consensus, verification, a quality judgment, or a
+universal score.
 
 ## Public Research Tool Boundary
 
