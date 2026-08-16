@@ -28,7 +28,7 @@ a story, article, source, or News Board item.
    Pricing paths, and stop before News Board discovery.
 3. For a copied News Board request, call `inspect_news_board_story_targets` with
    the title or public URL. Select exactly one unambiguous bounded target, call
-   `inspect_news_board_story` with the returned target, then call
+   `inspect_news_board_story` with its returned `storyId` and `storyLocator`, then call
    `inspect_news_board_story_research` with its `researchTarget`. Follow only the
    current stage-specific `effectiveRules` returned by inspection.
 4. For a Research Desk history request, call
@@ -86,12 +86,17 @@ a story, article, source, or News Board item.
    it and return its `currentPackageDraft` when present. If a save returns
    `status: "unchanged"` or `stage: "no_change"`, treat that as a successful
    terminal result; do not retry the save or call `inspect_recent_mcp_actions`
-   to verify it. Use `save_news_board_story_research_section` only after
-   inspecting an existing saved package when one section needs a targeted
-   correction; provide `story`, `expectedUpdatedAt`, `packageFingerprint`,
-   `rulesFingerprint`, `sectionId`, `section`, optional `qualityEvidence`,
-   optional `researchMarkdown`, and optional `storyDisplaySnapshot`. Omit
-   `storyDisplaySnapshot` to preserve current package display metadata. If
+   to verify it. For one requested section, copy the canonical operation,
+   story selector, concurrency tokens, Rules token, available sections, and
+   completed sections from `sectionWriteContext`. Add `sectionId`, `section`,
+   optional `qualityEvidence`, optional `researchMarkdown`, and optional
+   `storyDisplaySnapshot`; call
+   `validate_news_board_story_research_section` before the canonical
+   `save_news_board_story_research_section` operation. Omit
+   `storyDisplaySnapshot` on later updates to preserve current package display
+   metadata. `expectedUpdatedAt` is the compare-and-swap token;
+   package-level `researchedAt` records the latest applied save and is not a
+   write token. Empty non-requested sections remain incomplete. If
    current Rules make the targeted save impossible without changing another
    section, report the blocker rather than broadening the update. If the findings
    would materially replace the saved package, summarize the differences and
@@ -117,11 +122,16 @@ a story, article, source, or News Board item.
 16. Call `create_design_from_story_research` last with the saved research
    freshness/package tokens, inspected template/page/state token, bounded
    fills, Template Rule fingerprint, title, an optional saved image candidate
-   with preserved rights metadata for user review, and a new UUID idempotency
-   key.
+   identified by canonical `mediaCandidateId` with preserved rights metadata
+   for user review, and a new UUID idempotency key. The legacy
+   `imageCandidateId` spelling is accepted temporarily as input but is never
+   returned or recommended.
 17. If creation fails, do not automatically retry with another image, template,
     field mapping, or image-free fallback. Re-inspect fresh state, explain the
-    changed plan, and obtain fresh approval before another mutation.
+    changed plan, and obtain fresh approval before another mutation. Use
+    bounded field issue paths and `image_import_failed` categories to identify
+    the blocked candidate without exposing or guessing raw provider or Storage
+    data.
 
 ## Guardrails
 

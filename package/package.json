@@ -1,6 +1,6 @@
 {
   "name": "@desk-rules/cli",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Desk Rules MCP setup, diagnostics, and update guidance.",
   "type": "module",
   "private": false,
