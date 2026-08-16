@@ -42,11 +42,11 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "be28decbf29ee67cb9408d1dc2380e081c19b5cbe504dbc8cdbf197ffeb795a4"
+      "sha256": "759bb9a1649aa4afc4defb423ca128490195c1af0b2eb8bfb55287eab4c63552"
     },
     {
       "path": "package.json",
-      "sha256": "ff753d228856f7de6d4cd777a385d8894edb9cc11d34a4141cd23ec5387cce71"
+      "sha256": "0575574c0efe498c7257fb4efde8c69c236d76c3581824b22bb0b63ee882f02d"
     },
     {
       "path": "package/LICENSE",
@@ -58,19 +58,19 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "f723a639c99d6e97b464625a30ed7dcaaf8a140ad2a763828a959dbc598b4d70"
+      "sha256": "c82cb4ccf9f768506c4c938328b1afdee860d4547c23256f645f6fde79f47b50"
     },
     {
       "path": "package/package.json",
-      "sha256": "4e09cbad049cdc7b39892a0700e085c81df02fdec178fa68e5316dcf28f0748b"
+      "sha256": "8871f3ebcb38d1f296e671480790158b7581957c170350e0efcace1d52ea267b"
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "5322264e3f96c7b106c7332f1709fb6fbf33cf795615a4aa9fa2012eb7066741"
+      "sha256": "87b03dca06322cb0ec29d9db4bf8a31e8e4a74301e258568751aa644f8615907"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
-      "sha256": "7660b6bbf608a08436ba6ae43b43226340bfdd13d6fbb352092210884a269b9a"
+      "sha256": "b0c7ac1a55427473955ad8db84d0c0b78709c3aaae08857e566367a64ed25764"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/export-and-publish.md",
@@ -78,31 +78,35 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/first-safe-check.md",
-      "sha256": "dfa1da9a3c26a46f215e9bf27f2fd17055ff02889063667762605277d82bb4c4"
+      "sha256": "46f73c50733e4cd3d47fc2a6144dfadea26494d3af266a673c2fa95a08087e28"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
-      "sha256": "acef2191ddb10ad1e1e995ebab83a41cd7e137b641131042385364ee2c9aa81d"
+      "sha256": "79d5777bcc3a7df3d3e301671d3109215ee867dfdfe46a92d7e777d2dec1dda7"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
-      "sha256": "8a1615ef8dca29d5b2ad7d99e74fb58c089601057a6544ee3c9be15d4937d1c2"
+      "sha256": "7ba3aba4c0eb98194eeaaa18dedb0a56af34d06bb6b37722261e402f9aaa9f63"
     },
     {
       "path": "package/src/codex-config-repair.ts",
-      "sha256": "2b6584368d4810cec5a0b18fe76904ff081a76a4cde9d389d4fa7dd198b65f16"
+      "sha256": "36758d44dc9fd7e59f79e34f1ff45f0c65fe8004484554eee47100ec7894b7c3"
     },
     {
       "path": "package/src/index.ts",
-      "sha256": "62ae08248aa097df059610ea6f1605745ef5d99780190490b797e26f78bb5f65"
+      "sha256": "5a16907f155c632b97afe1a61dc6805efcfb090578c6fc428d0bf31861266cdc"
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "aeab0c8bdc78d4bb50089502847fbadd486943f2af97cd812a6687b5a532526e"
+      "sha256": "9270bffd467dfa460da8a8dbf9f20f98553d08e0f7115b52cbc44907636dc120"
     },
     {
       "path": "package/src/oauth-metadata.ts",
       "sha256": "a07cabc5b31df105ae11ccdedf1316e5432073939dd663fc0e7d01843d1d48e4"
+    },
+    {
+      "path": "package/src/public-compatibility.ts",
+      "sha256": "0c8267802a59872f4b92dfa2451a345d90edeada8e086bfa4425064867575724"
     },
     {
       "path": "package/tsconfig.json",
@@ -110,7 +114,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "e819ef3801fd3db139b390f81287ee60bce89b32cc6cb65e9f8e593c0efbd1e3"
+      "sha256": "4c35c6a9ab0e7ace3ad8b2f95b07ab3a9299c28ee7c939b53642272dfc94e7ad"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -118,12 +122,12 @@
     },
     {
       "path": "tests/cli.test.ts",
-      "sha256": "9405a3ccf01f5d598113664c10d839b6a4e4f43dd59ca646ffbd6e027d36a4a5"
+      "sha256": "e9d6829baffe27375e79a0f9d437ab62bf949b36acd12c8bcbca4cb840f858e0"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "0f2f10b5329f4daec1a27bfd7bfea4e215a28e84",
+    "commit": "605ce50997a8762530e3359325b3fc7423d32562",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
