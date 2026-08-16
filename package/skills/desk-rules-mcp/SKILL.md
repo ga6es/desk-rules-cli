@@ -34,6 +34,7 @@ Operate Desk Rules MCP through the hosted endpoint
    `inspect_editor_capability_map`, `inspect_mcp_tool_examples`,
    `inspect_news_board_story_targets`, `inspect_news_board_story`,
    `inspect_news_board_story_research`, `save_news_board_story_research`,
+   `validate_news_board_story_research_section`,
    `save_news_board_story_research_section`,
    `create_design_from_story_research`, Agent Draft, export, or publish tools.
    Do not use external web, search, browser, or other research tools.
@@ -101,15 +102,27 @@ Operate Desk Rules MCP through the hosted endpoint
    retry. `qualityEvidence` is transient validation input, not saved research
    JSON. Use it only for bounded blocked/not_applicable evidence when a
    returned research quality requirement cannot be satisfied.
-13. Use `save_news_board_story_research_section` only after inspecting an
-    existing saved package when one section needs a targeted correction. Build
-    it from `story`, `expectedUpdatedAt`, `packageFingerprint`,
-    `rulesFingerprint`, `sectionId`, `section`, optional `qualityEvidence`,
-    optional `researchMarkdown`, and optional `storyDisplaySnapshot`. Omit
-    `storyDisplaySnapshot` to preserve current package display metadata. Do not
-    use it to create the first saved package. If current Rules make the targeted
-    save impossible without changing another section, report the blocker rather
-    than broadening the update.
+13. For one requested section, copy `story`, `expectedUpdatedAt`,
+    `packageFingerprint`, and `rulesFingerprint` from the bounded
+    `sectionWriteContext` returned by `inspect_news_board_story_research`.
+    Add `sectionId`, `section`, optional `qualityEvidence`, optional
+    `researchMarkdown`, and optional `storyDisplaySnapshot`; validate that
+    exact payload with `validate_news_board_story_research_section`, then save
+    it through the canonical `save_news_board_story_research_section`
+    operation. Client-generated callable aliases are host-owned and do not
+    replace that canonical name. Omit `storyDisplaySnapshot` on later updates
+    to preserve current package display metadata. A completed section was
+    explicitly validated and saved; empty non-requested sections remain
+    incomplete. `expectedUpdatedAt` is the compare-and-swap token, while
+    package-level `researchedAt` records the latest applied save and is not a
+    write token. If current Rules make the targeted save impossible without
+    changing another section, report the blocker rather than broadening it.
+14. For a saved-research design image, copy the candidate id into canonical
+    `imageFill.mediaCandidateId` and an inspected media `sourceFieldId`. Never
+    send a raw URL, asset id, owner id, bucket, or Storage path. The legacy
+    `imageCandidateId` spelling is accepted temporarily as input but is never
+    returned or recommended. Treat bounded `image_import_failed` issue codes
+    as the safe recovery reason; do not infer or expose raw provider failures.
 
 ## Signal Feeds And Feed Configs
 
