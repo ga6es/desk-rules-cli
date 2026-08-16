@@ -13,7 +13,6 @@ import {
   type CodexConfigRepairPlan,
 } from "./codex-config-repair.js"
 import {
-  DESK_RULES_MCP_READ_FIRST_TOOL_NAMES,
   DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES,
   DESK_RULES_MCP_SERVER_MANIFEST,
 } from "./manifest.js"
@@ -69,13 +68,8 @@ const BUNDLED_SKILLS = [
   {
     name: "desk-rules-mcp",
     packagePath: "skills/desk-rules-mcp",
-    version: DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumSkillsVersion,
+    version: DESK_RULES_MCP_SERVER_MANIFEST.compatibility.currentSkillsVersion,
   },
-] as const
-const FIRST_SAFE_PROMPTS = [
-  "Check my Desk Rules MCP authorization status and explain what you can inspect.",
-  "Show me Desk Rules MCP examples for finding and inspecting a recent design.",
-  "List my recent Desk Rules designs, then inspect one design I choose without making changes.",
 ] as const
 
 function parseArgs(argv: readonly string[]): ParsedArgs {
@@ -176,7 +170,7 @@ function parseCodexRepairArgs(argv: readonly string[]): CodexRepairArgs {
 function parseCodexSetupArgs(argv: readonly string[]): CodexSetupArgs {
   const seen = new Set<string>()
   let endpoint: string | null = null
-  let profile: CodexSetupArgs["profile"] = "full"
+  let profile: CodexSetupArgs["profile"] = "starter"
 
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index]!
@@ -484,8 +478,6 @@ async function runDoctor(flags: Map<string, string | true>) {
 
 function readCodexConfigDiagnosticMessage(code: CodexConfigDiagnosticCode) {
   const messages: Record<CodexConfigDiagnosticCode, string> = {
-    ambiguous_desk_rules_blocks:
-      "Multiple recognized Desk Rules MCP blocks exist. Consolidate them manually before repair.",
     config_missing:
       "Codex user config was not found. Run `deskrules mcp setup codex` for a canonical block.",
     config_not_regular:
@@ -497,15 +489,11 @@ function readCodexConfigDiagnosticMessage(code: CodexConfigDiagnosticCode) {
     desk_rules_block_missing:
       "No recognized Desk Rules MCP block was found. Run `deskrules mcp setup codex`.",
     healthy:
-      "The recognized Desk Rules MCP block has the canonical endpoint and no tool allowlist.",
+      "The Desk Rules MCP block uses the canonical endpoint and requested discovery profile.",
     invalid_service_tier:
       "The global service_tier value `default` is unsupported. Remove that line manually; Desk Rules repair will not change global Codex settings.",
-    legacy_server_name:
-      "The Desk Rules block uses a recognized legacy name. It remains supported temporarily.",
     malformed_toml:
       "Codex config is malformed TOML. Repair refused; fix the syntax or restore a known-good backup.",
-    noncanonical_endpoint:
-      "The recognized Desk Rules block uses a registered legacy endpoint.",
     restricted_starter_profile:
       "The recognized Desk Rules block uses the current explicit starter profile.",
     stale_enabled_tools:
@@ -525,8 +513,7 @@ function createCodexConfigChecks(plan: CodexConfigRepairPlan): CliCheck[] {
     status:
       code === "healthy"
         ? "pass"
-        : code === "legacy_server_name" ||
-            code === "restricted_starter_profile" ||
+        : code === "restricted_starter_profile" ||
             code === "custom_enabled_tools" ||
             code === "config_missing" ||
             code === "desk_rules_block_missing"
@@ -585,7 +572,7 @@ async function printDoctor(flags: Map<string, string | true>) {
     process.stdout.write(
       "Billing diagnostics never quote prices or recommend a plan; the live Pricing page is authoritative.\n",
     )
-    process.stdout.write("Next: run deskrules mcp test after authenticating in your agent.\n")
+    process.stdout.write("Next: authenticate Desk Rules MCP in your agent.\n")
   }
   process.exitCode = hasFailures(result.checks) ? 1 : 0
 }
@@ -611,7 +598,7 @@ function printCodexSetup(args: CodexSetupArgs) {
       "Desk Rules MCP Codex setup",
       `Profile: ${args.profile}`,
       "",
-      "Add this remote MCP server in Codex settings, or place this block in the MCP server config:",
+      "Use this manual configuration only when the Desk Rules plugin is not installed:",
       "",
       "[mcp_servers.desk-rules-mcp]",
       `url = "${endpoint}"`,
@@ -623,8 +610,8 @@ function printCodexSetup(args: CodexSetupArgs) {
       "Then open Codex, authenticate Desk Rules MCP, and run /mcp to confirm it is connected.",
       "Compatible clients negotiate modern MCP automatically with stateless legacy fallback.",
       args.profile === "full"
-        ? DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.default.description
-        : DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.starter.description,
+        ? DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.full.description
+        : DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.default.description,
       DESK_RULES_MCP_SERVER_MANIFEST.compatibility.reconnectPolicy.permissionInvariant,
       `Docs: ${createDocsUrl(endpoint)}`,
       `Agent setup prompt: ${createPromptDocsUrl(endpoint)}`,
@@ -649,25 +636,6 @@ function printClaudeSetup(flags: Map<string, string | true>) {
       "",
     ].join("\n"),
   )
-}
-
-async function printMcpTest(flags: Map<string, string | true>) {
-  const result = await runDoctor(flags)
-
-  process.stdout.write("Desk Rules MCP safe test\n")
-  printChecks(result.checks)
-  process.stdout.write("\nRead-first starter tools:\n")
-  for (const toolName of DESK_RULES_MCP_READ_FIRST_TOOL_NAMES) {
-    process.stdout.write(`- ${toolName}\n`)
-  }
-  process.stdout.write("\nPrompts to run inside your authenticated agent:\n")
-  for (const prompt of FIRST_SAFE_PROMPTS) {
-    process.stdout.write(`- ${prompt}\n`)
-  }
-  process.stdout.write(
-    "\nThe CLI checks setup and auth-gating; the authenticated agent performs the workspace read test.\n",
-  )
-  process.exitCode = hasFailures(result.checks) ? 1 : 0
 }
 
 function printCodexRepairResult(input: {
@@ -793,6 +761,9 @@ function printUpdateGuidance() {
       "Desk Rules update guidance",
       "",
       `Installed CLI version: ${CURRENT_CLI_VERSION}`,
+      `Current CLI bundle version: ${DESK_RULES_MCP_SERVER_MANIFEST.cli.currentVersion}`,
+      `Current plugin bundle version: ${compatibility.currentPluginVersion}`,
+      `Current skills bundle version: ${compatibility.currentSkillsVersion}`,
       `Minimum CLI version: ${compatibility.minimumCliVersion}`,
       `Minimum plugin version: ${compatibility.minimumPluginVersion}`,
       `Minimum skills version: ${compatibility.minimumSkillsVersion}`,
@@ -857,7 +828,6 @@ function printHelp() {
       "  deskrules mcp repair codex [--config <path>] [--profile <full|starter>] [--apply] [--json]",
       "  deskrules mcp setup codex [--endpoint <url>] [--profile <full|starter>]",
       "  deskrules mcp setup claude [--endpoint <url>]",
-      "  deskrules mcp test [--endpoint <url>] [--offline]",
       "  deskrules update",
       "  deskrules skills list",
       "  deskrules help",
@@ -913,20 +883,6 @@ async function main() {
 
   if (first === "mcp" && second === "setup" && third === "claude") {
     printClaudeSetup(parsed.flags)
-    return
-  }
-
-  if (first === "mcp" && second === "install") {
-    process.stderr.write(
-      "The install command was renamed to setup because this CLI prints host-specific setup guidance.\n\n",
-    )
-    printHelp()
-    process.exitCode = 1
-    return
-  }
-
-  if (first === "mcp" && second === "test") {
-    await printMcpTest(parsed.flags)
     return
   }
 

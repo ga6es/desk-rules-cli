@@ -27,8 +27,9 @@ const cliVersion = JSON.parse(
   readFileSync(new URL("../package/package.json", import.meta.url), "utf8"),
 ).version as string
 
-test("Codex repair fails closed and updates a recognized legacy endpoint", async () => {
+test("Codex repair fails closed and recognizes the canonical starter profile", async () => {
   const { planCodexConfigRepair } = await loadSourceModules()
+  const manifestModule = await import(manifestModuleUrl)
   assert.equal(
     planCodexConfigRepair(
       '[mcp_servers.desk-rules-mcp]\nurl = "unterminated\n',
@@ -37,13 +38,29 @@ test("Codex repair fails closed and updates a recognized legacy endpoint", async
   )
   const plan = planCodexConfigRepair(
     [
-      "[mcp_servers.desk-rules-create-from-story-remote]",
-      'url = "https://desk-rules-production.up.railway.app/api/mcp"',
+      "[mcp_servers.desk-rules-mcp]",
+      `url = "${canonicalEndpoint}"`,
+      `enabled_tools = ${JSON.stringify(manifestModule.DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES)}`,
       "",
     ].join("\n"),
   )
-  assert.equal(plan.status, "fixable")
+  assert.equal(plan.status, "healthy")
+  assert.deepEqual(plan.diagnostics, ["restricted_starter_profile"])
   assert.match(plan.updatedSource ?? "", new RegExp(canonicalEndpoint))
+})
+
+test("Codex repair keeps a custom allowlist separate from the starter profile", async () => {
+  const { planCodexConfigRepair } = await loadSourceModules()
+  const plan = planCodexConfigRepair(
+    [
+      "[mcp_servers.desk-rules-mcp]",
+      `url = "${canonicalEndpoint}"`,
+      'enabled_tools = ["inspect_mcp_authorization_status"]',
+      "",
+    ].join("\n"),
+  )
+  assert.equal(plan.status, "healthy")
+  assert.deepEqual(plan.diagnostics, ["custom_enabled_tools"])
 })
 
 test("OAuth metadata discovery rejects unsafe issuers", async () => {
@@ -101,4 +118,15 @@ test("built CLI reports its offline compatibility and bundled skill", async () =
     skills.stdout,
     new RegExp(skillsVersion.replaceAll(".", "\\.")),
   )
+})
+
+test("breaking CLI rejects the removed mcp install alias", () => {
+  const result = spawnSync(
+    process.execPath,
+    ["package/dist/index.js", "mcp", "install"],
+    { encoding: "utf8" },
+  )
+  assert.equal(result.status, 1)
+  assert.match(result.stderr, /Unknown command: mcp install/)
+  assert.doesNotMatch(result.stderr, /renamed to setup/)
 })

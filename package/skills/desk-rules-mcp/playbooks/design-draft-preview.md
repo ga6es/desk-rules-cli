@@ -18,13 +18,15 @@ Rules design.
    change is not already clear.
 2. Run `start_agent_draft`.
 3. Run `apply_actions_to_draft` with typed actions only.
-4. Run `inspect_agent_draft`.
-5. Run `preview_agent_draft_page` and explain the proposed change.
-6. Commit with `commit_agent_draft` only after explicit user approval.
-7. Discard with `discard_agent_draft` if the user rejects the change.
+4. Use the returned draft state to run `preview_agent_draft_page`, then explain
+   the proposed change.
+5. Commit with `commit_agent_draft` only after explicit user approval.
+6. Discard with `discard_agent_draft` if the user rejects the change.
 
 ## Guardrails
 
 - Do not mutate the live design outside the Agent Draft commit step.
+- In the full profile, use `inspect_agent_draft` only to resume or recover a
+  draft when the latest apply or preview response is unavailable.
 - Preserve `expectedUpdatedAt`; re-inspect when stale.
 - Keep outputs bounded and user-facing.

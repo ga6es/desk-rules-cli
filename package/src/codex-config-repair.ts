@@ -25,7 +25,6 @@ const MAX_CODEX_CONFIG_BYTES = 1_000_000
 const INVALID_SERVICE_TIER = "default"
 
 export type CodexConfigDiagnosticCode =
-  | "ambiguous_desk_rules_blocks"
   | "config_missing"
   | "config_not_regular"
   | "config_not_utf8"
@@ -33,9 +32,7 @@ export type CodexConfigDiagnosticCode =
   | "desk_rules_block_missing"
   | "healthy"
   | "invalid_service_tier"
-  | "legacy_server_name"
   | "malformed_toml"
-  | "noncanonical_endpoint"
   | "restricted_starter_profile"
   | "stale_enabled_tools"
   | "custom_enabled_tools"
@@ -44,7 +41,6 @@ export type CodexConfigDiagnosticCode =
 export type CodexConfigRepairAction =
   | "remove_enabled_tools"
   | "replace_enabled_tools"
-  | "replace_endpoint"
 
 export type CodexConfigProfileIntent = "full" | "preserve" | "starter"
 
@@ -135,21 +131,7 @@ function isTableHeader(line: string) {
 }
 
 function recognizedServerNames() {
-  const aliases = DESK_RULES_MCP_SERVER_MANIFEST.legacyAliases
-    .filter((entry) => entry.kind === "client_config_name")
-    .map((entry) => entry.alias)
-  return new Set<string>([
-    DESK_RULES_MCP_SERVER_MANIFEST.serverName,
-    ...aliases,
-  ])
-}
-
-function recognizedLegacyEndpoints() {
-  return new Set<string>(
-    DESK_RULES_MCP_SERVER_MANIFEST.legacyEndpoints.map(
-      (entry) => entry.endpoint,
-    ),
-  )
+  return new Set<string>([DESK_RULES_MCP_SERVER_MANIFEST.serverName])
 }
 
 function renderStarterProfile(newline: string) {
@@ -283,10 +265,6 @@ export function planCodexConfigRepair(
       updatedSource: null,
     } satisfies CodexConfigRepairPlan
   }
-  if (candidateNames.length > 1) {
-    return blockedPlan([...diagnostics, "ambiguous_desk_rules_blocks"])
-  }
-
   const serverName = candidateNames[0]!
   const serverConfig = servers[serverName]
   if (!isRecord(serverConfig)) {
@@ -331,26 +309,10 @@ export function planCodexConfigRepair(
 
   const actions: CodexConfigRepairAction[] = []
   const edits: SourceEdit[] = []
-  const urlLine = urlLines[0]!
   if (
     serverConfig.url !== DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint
   ) {
-    if (!recognizedLegacyEndpoints().has(serverConfig.url)) {
-      return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-    }
-    const urlMatch = urlLine.content.match(
-      /^(\s*url\s*=\s*)(?:"[^"\r\n]*"|'[^'\r\n]*')(\s*(?:#.*)?)$/,
-    )
-    if (!urlMatch) {
-      return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-    }
-    actions.push("replace_endpoint")
-    diagnostics.push("noncanonical_endpoint")
-    edits.push({
-      end: urlLine.end,
-      replacement: `${urlMatch[1]}"${DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint}"${urlMatch[2]}${source.slice(urlLine.content.length + urlLine.start, urlLine.end)}`,
-      start: urlLine.start,
-    })
+    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
   }
 
   if (Object.hasOwn(serverConfig, "enabled_tools")) {
@@ -412,9 +374,6 @@ export function planCodexConfigRepair(
     })
   }
 
-  if (serverName !== DESK_RULES_MCP_SERVER_MANIFEST.serverName) {
-    diagnostics.push("legacy_server_name")
-  }
   if (diagnostics.includes("invalid_service_tier")) {
     return {
       actions,
