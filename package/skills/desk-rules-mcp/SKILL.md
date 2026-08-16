@@ -87,7 +87,9 @@ Operate Desk Rules MCP through the hosted endpoint
     comments, keep excerpts within 1,000 characters, and assign each comment one
     distinct representative type from `most_upvoted`,
     `skeptical_or_fake_news`, `fact_checking`, `supportive`, or
-    `clarifying_or_context`. Do not coerce, discard, or relabel a comment to make
+    `clarifying_or_context`. Set `scoreStatus` to `observed` for a numeric score
+    and `hidden_or_unavailable` when `score` is null; never infer a score the
+    source did not expose. Do not coerce, discard, or relabel a comment to make
     validation pass.
 
 12. Build `save_news_board_story_research` from `story`, `expectedUpdatedAt`,
@@ -102,21 +104,33 @@ Operate Desk Rules MCP through the hosted endpoint
    retry. `qualityEvidence` is transient validation input, not saved research
    JSON. Use it only for bounded blocked/not_applicable evidence when a
    returned research quality requirement cannot be satisfied.
-13. For one requested section, copy `story`, `expectedUpdatedAt`,
+13. For one requested section, call `inspect_news_board_story_research` with
+    `view: { mode: "compact", sectionId }`, then copy `story`, `expectedUpdatedAt`,
     `packageFingerprint`, and `rulesFingerprint` from the bounded
     `sectionWriteContext` returned by `inspect_news_board_story_research`.
     Add `sectionId`, `section`, optional `qualityEvidence`, optional
     `researchMarkdown`, and optional `storyDisplaySnapshot`; validate that
-    exact payload with `validate_news_board_story_research_section`, then save
-    it through the canonical `save_news_board_story_research_section`
-    operation. Client-generated callable aliases are host-owned and do not
-    replace that canonical name. Omit `storyDisplaySnapshot` on later updates
+    exact payload with `validate_news_board_story_research_section`. On
+    success, copy its normalized `validatedSection.sectionId` and
+    `validatedSection.section` into the canonical
+    `save_news_board_story_research_section`
+    operation on the canonical Desk Rules MCP surface. Each request is
+    self-contained and does not depend on a transport session. Failed
+    validation returns no reusable artifact, and save independently revalidates
+    the complete request. Host- or client-generated aliases and separately
+    configured MCP namespaces are non-canonical conveniences. Desk Rules emits
+    canonical operation names and does not own those aliases or client
+    configurations. Omit `storyDisplaySnapshot` on later updates
     to preserve current package display metadata. A completed section was
     explicitly validated and saved; empty non-requested sections remain
     incomplete. `expectedUpdatedAt` is the compare-and-swap token, while
     package-level `researchedAt` records the latest applied save and is not a
-    write token. If current Rules make the targeted save impossible without
-    changing another section, report the blocker rather than broadening it.
+    write token. `sectionFingerprints` and `researchMarkdownFingerprint` are
+    deterministic comparison evidence derived at read time. Validation and
+    save responses include before/after and preserved fingerprint evidence.
+    Never send these hashes back as concurrency tokens. If current Rules make
+    the targeted save impossible without changing another section, report the
+    blocker rather than broadening it.
 14. For a saved-research design image, copy the candidate id into canonical
     `imageFill.mediaCandidateId` and an inspected media `sourceFieldId`. Never
     send a raw URL, asset id, owner id, bucket, or Storage path. The legacy
