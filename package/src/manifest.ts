@@ -15,8 +15,8 @@ export const DESK_RULES_MCP_SERVER_MANIFEST = {
     npmPackageStatus: "published",
     npmPersistentInstallCommand: "npm install -g @desk-rules/cli",
     npmRunCommand: "npm exec @desk-rules/cli@latest --",
-    preparedVersion: "0.1.10",
-    publishedVersion: "0.1.9",
+    preparedVersion: "0.1.11",
+    publishedVersion: "0.1.10",
     standaloneBinaryStatus: "planned",
   },
   compatibility: {
@@ -126,7 +126,7 @@ export const DESK_RULES_MCP_SERVER_MANIFEST = {
     pricing: "/pricing",
     providerConnections: "/account/apps",
   },
-  manifestVersion: "2026-08-15.research-workflows-v1",
+  manifestVersion: "2026-08-16.research-ergonomics-v1",
   plugin: {
     codexMarketplaceStatus: "private-preview",
     packageName: "desk-rules-mcp",

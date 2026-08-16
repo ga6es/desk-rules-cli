@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "a65a1b96bcc0231da9b87f7c9ac03624f494dbf299d2b397f64f9cb965a42765"
+      "sha256": "be28decbf29ee67cb9408d1dc2380e081c19b5cbe504dbc8cdbf197ffeb795a4"
     },
     {
       "path": "package.json",
@@ -62,11 +62,11 @@
     },
     {
       "path": "package/package.json",
-      "sha256": "fa670de6a8e592c9c40a42118fd980a5ad084f9a0ed9053fc7be32f0276904e7"
+      "sha256": "4e09cbad049cdc7b39892a0700e085c81df02fdec178fa68e5316dcf28f0748b"
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "2720d601189476658f23dabfa38f4adbc8debaee79e1f46e10e96679d790eddf"
+      "sha256": "5322264e3f96c7b106c7332f1709fb6fbf33cf795615a4aa9fa2012eb7066741"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
@@ -82,7 +82,7 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
-      "sha256": "05641bd37e6dcb617ac1f2cdf38cf76481b76905c0077fa21a2a4ce09bec7b72"
+      "sha256": "acef2191ddb10ad1e1e995ebab83a41cd7e137b641131042385364ee2c9aa81d"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
@@ -98,7 +98,7 @@
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "b339f023ba142b44bf480ac67b0600142f5a6febcad048ef1e0634f654270bc7"
+      "sha256": "aeab0c8bdc78d4bb50089502847fbadd486943f2af97cd812a6687b5a532526e"
     },
     {
       "path": "package/src/oauth-metadata.ts",
@@ -110,7 +110,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "af447e472a2e9f8eca631e797803e9018079ffa6e22268d70705d609784ed0d2"
+      "sha256": "e819ef3801fd3db139b390f81287ee60bce89b32cc6cb65e9f8e593c0efbd1e3"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -123,7 +123,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "20f8dce45e1d561c44b0ef840383cf9b73502800",
+    "commit": "0f2f10b5329f4daec1a27bfd7bfea4e215a28e84",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

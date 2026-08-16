@@ -86,17 +86,29 @@ a story, article, source, or News Board item.
    it and return its `currentPackageDraft` when present. If a save returns
    `status: "unchanged"` or `stage: "no_change"`, treat that as a successful
    terminal result; do not retry the save or call `inspect_recent_mcp_actions`
-   to verify it. For one requested section, copy the canonical operation,
+   to verify it. For one requested section, call
+   `inspect_news_board_story_research` with
+   `view: { mode: "compact", sectionId }`, then copy the canonical operations,
    story selector, concurrency tokens, Rules token, available sections, and
    completed sections from `sectionWriteContext`. Add `sectionId`, `section`,
    optional `qualityEvidence`, optional `researchMarkdown`, and optional
    `storyDisplaySnapshot`; call
-   `validate_news_board_story_research_section` before the canonical
-   `save_news_board_story_research_section` operation. Omit
+   `validate_news_board_story_research_section` first. On success, copy its
+   normalized `validatedSection.sectionId` and `validatedSection.section` into
+   the canonical `save_news_board_story_research_section` operation on the canonical Desk
+   Rules MCP surface. Each request is self-contained and does not depend on a
+   transport session. Failed validation returns no reusable artifact, and save
+   independently revalidates the complete request. Host- or client-generated
+   aliases and separately configured MCP namespaces are non-canonical
+   conveniences. Desk Rules emits canonical operation names and does not own
+   those aliases or client configurations. Omit
    `storyDisplaySnapshot` on later updates to preserve current package display
    metadata. `expectedUpdatedAt` is the compare-and-swap token;
    package-level `researchedAt` records the latest applied save and is not a
-   write token. Empty non-requested sections remain incomplete. If
+   write token. Use `sectionFingerprints`, `researchMarkdownFingerprint`, and
+   validation/save `fingerprintEvidence` only to compare targeted content and
+   prove preservation; never send them back as write tokens. Empty
+   non-requested sections remain incomplete. If
    current Rules make the targeted save impossible without changing another
    section, report the blocker rather than broadening the update. If the findings
    would materially replace the saved package, summarize the differences and
