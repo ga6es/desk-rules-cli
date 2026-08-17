@@ -22,17 +22,23 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
 
 ## Research
 
-1. Resolve one logical story with `inspect_news_board_story_targets`, then use
-   its deterministic inspection target with `inspect_news_board_story`.
-2. Inspect current research with `inspect_news_board_story_research`.
-3. For one section, request the compact view. Copy the fields from its
+1. Resolve a copied `story_XXXXXXXXXX` ID by passing it unchanged as the
+   `query` to `inspect_news_board_story_targets`, then use its deterministic
+   inspection target with `inspect_news_board_story`.
+2. For multiple copied IDs, resolve them independently in request order. Skip
+   repeated IDs, report each missing ID without blocking valid IDs, and avoid
+   duplicate research when targets share a `storyFingerprint`.
+3. If resolution reports `story_fingerprint_collision`, stop and report the
+   collision rather than selecting either story.
+4. Inspect current research with `inspect_news_board_story_research`.
+5. For one section, request the compact view. Copy the fields from its
    `writeContext` into the top level of
    `validate_news_board_story_research_section`; do not send a nested
    `writeContext` object.
-4. Copy the same top-level write fields and the returned `validatedSection`
+6. Copy the same top-level write fields and the returned `validatedSection`
    into `save_news_board_story_research_section`. This supports first-section
    creation and never fabricates other sections.
-5. Treat a successful save response, including `status: "unchanged"`, as
+7. Treat a successful save response, including `status: "unchanged"`, as
    sufficient preservation confirmation. Inspect again only when subsequent
    work needs package content.
 
