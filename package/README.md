@@ -29,10 +29,10 @@ skills into host-specific folders or grant Desk Rules write authorization.
 
 ## Compatibility
 
-- Current CLI contract: `0.2.0`
-- Minimum compatible CLI contract: `0.2.0`
-- Current plugin and bundled skill contract: `0.2.0`
-- MCP manifest: `2026-08-16.mcp-surface-prune-v2`
+- Current CLI contract: `0.2.1`
+- Minimum compatible CLI contract: `0.2.1`
+- Current plugin and bundled skill contract: `0.2.1`
+- MCP manifest: `2026-08-17.story-fingerprint-copy-id-v1`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The

@@ -30,7 +30,7 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
     updateContract:
       "CLI, plugins, skills, docs, smoke tests, and Account UI consume the public compatibility contract instead of inventing release metadata.",
   },
-  manifestVersion: "2026-08-16.mcp-surface-prune-v2",
+  manifestVersion: "2026-08-17.story-fingerprint-copy-id-v1",
   profiles: {
     starterTools: [
       "inspect_mcp_authorization_status",
@@ -107,17 +107,17 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
   serverName: "desk-rules-mcp",
   versions: {
     cli: {
-      current: "0.2.0",
-      minimumCompatible: "0.2.0",
-      published: "0.1.11",
+      current: "0.2.1",
+      minimumCompatible: "0.2.1",
+      published: "0.2.0",
     },
     plugin: {
-      current: "0.2.0",
-      minimumCompatible: "0.2.0",
+      current: "0.2.1",
+      minimumCompatible: "0.2.1",
     },
     skills: {
-      current: "0.2.0",
-      minimumCompatible: "0.2.0",
+      current: "0.2.1",
+      minimumCompatible: "0.2.1",
     },
   },
 } as const
