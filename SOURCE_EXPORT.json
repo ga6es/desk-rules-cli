@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "314f63afc43c34b254f682a42a43c963ac5a8bc25859517f7c81305e989a6383"
+      "sha256": "973be2eafc09ea23c08da421ebe5d075dc2e29be80aa4c4e9cabe956c89c3f8d"
     },
     {
       "path": "package.json",
@@ -58,15 +58,15 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "2a088282fbf396e1112f2eeca59cf1928db125dc285d26b041822d1cfc0a16ad"
+      "sha256": "45dd0321841e4d77e62c173d8bd6f9a38ba710a666ca640950a016249e478ce3"
     },
     {
       "path": "package/package.json",
-      "sha256": "ce81e78455dec834b0a046a53e8554840812dbbb6fa47aef41633a6d5536d627"
+      "sha256": "fa6c545fb2d8e77320eba09ce45f44a978d94cbdfc1467ecd57d3c0acfc05c6b"
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "ad4a518aff5c67ab67cc826da47bf513151f2cd6bc7f5685f5064415af3478f4"
+      "sha256": "11c0dc2a7646890e8b3e23dbf5e023d107b121da81140209dd7f283f345427a2"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
@@ -82,11 +82,11 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
-      "sha256": "d445f2ceaab61ecfa9ed08d25b61fb1629500b760a1ddeeb47c0417dfbd524c6"
+      "sha256": "c1fcc9dfe3e5fa0649408ca820292426e6503b84d5307e53dae03e61a4d9bdd1"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
-      "sha256": "7ba3aba4c0eb98194eeaaa18dedb0a56af34d06bb6b37722261e402f9aaa9f63"
+      "sha256": "a520a96a8687048a77bf9ed09cdec25fb364e67136a86da9c761353d71c89fdd"
     },
     {
       "path": "package/src/codex-config-repair.ts",
@@ -106,7 +106,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "cd25be67c11651cf92c5054172f1a624120831c658e2bcc9dac082fbdaa6a663"
+      "sha256": "2ce0597179cd4267d95934254afd902565afa8fb6b1ddb8c06b91da08180b9dc"
     },
     {
       "path": "package/tsconfig.json",
@@ -114,7 +114,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "dc8cfc8b9a7fe822ee1f7f66a7d289ccc0dc976fa811ea4416d71f5016b2bec2"
+      "sha256": "ccb2208ca75f4ba7030cd9b9c79e974c299d277d8bb74166f05a0237cc1d76e7"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -127,7 +127,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "449997b6ee405fca6a6e2db0f7e821b2188f01ab",
+    "commit": "8c5f0d81abb2dc03ea1c64f91d717c3d6a299fe4",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

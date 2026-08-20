@@ -3,10 +3,10 @@
 1. Run `inspect_mcp_authorization_status` and inspect only the relevant Rules.
 2. Follow the returned blocker and recovery path; do not bypass account,
    billing, provider, Rules, or publication gates.
-3. For stale writes, reinspect and copy the refreshed concurrency fields from
-   `writeContext` into the next request's top level.
-4. For setup or bundle problems, run
-   `npm exec @desk-rules/cli@latest -- mcp doctor`.
+3. For stale writes, reinspect and copy the refreshed `writeContext` directly
+   into the next request's top level, then add the requested section fields.
+4. For setup or bundle problems, use the Desk Rules plugin or the currently
+   published CLI doctor from the release notes.
 5. For Codex configuration, preview `deskrules mcp repair codex` and apply only
    after reviewing the bounded plan. The starter profile is the default; full
    discovery requires explicit `--profile full`.
