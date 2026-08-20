@@ -10,13 +10,13 @@ https://agents.deskrules.com/api/mcp
 ## Quick use
 
 ```bash
-npm exec @desk-rules/cli@latest -- mcp doctor
-npm exec @desk-rules/cli@latest -- mcp doctor --client codex
-npm exec @desk-rules/cli@latest -- mcp repair codex
-npm exec @desk-rules/cli@latest -- mcp setup codex
-npm exec @desk-rules/cli@latest -- mcp setup codex --profile full
-npm exec @desk-rules/cli@latest -- mcp setup claude
-npm exec @desk-rules/cli@latest -- skills list
+deskrules mcp doctor
+deskrules mcp doctor --client codex
+deskrules mcp repair codex
+deskrules mcp setup codex
+deskrules mcp setup codex --profile full
+deskrules mcp setup claude
+deskrules skills list
 ```
 
 Codex setup uses the restricted starter profile by default. Full tool discovery
@@ -29,10 +29,10 @@ skills into host-specific folders or grant Desk Rules write authorization.
 
 ## Compatibility
 
-- Current CLI contract: `0.2.1`
-- Minimum compatible CLI contract: `0.2.1`
-- Current plugin and bundled skill contract: `0.2.1`
-- MCP manifest: `2026-08-17.story-fingerprint-copy-id-v1`
+- Current CLI contract: `0.2.2`
+- Minimum compatible CLI contract: `0.2.2`
+- Current plugin and bundled skill contract: `0.2.2`
+- MCP manifest: `2026-08-17.story-identity-v1`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The

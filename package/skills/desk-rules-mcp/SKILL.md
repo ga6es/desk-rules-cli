@@ -22,25 +22,43 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
 
 ## Research
 
-1. Resolve a copied `story_XXXXXXXXXX` ID by passing it unchanged as the
+1. Resolve a `storyIdentity` such as `reddit:fullname:t3_...`,
+   `rss:source-entry:<sourceId>:<entryId>`, or a story URL by passing it as the
    `query` to `inspect_news_board_story_targets`, then use its deterministic
    inspection target with `inspect_news_board_story`.
-2. For multiple copied IDs, resolve them independently in request order. Skip
-   repeated IDs, report each missing ID without blocking valid IDs, and avoid
-   duplicate research when targets share a `storyFingerprint`.
-3. If resolution reports `story_fingerprint_collision`, stop and report the
+2. For multiple story identities, resolve them independently in request order.
+   Skip repeated identities, report each missing identity without blocking valid
+   ones, and avoid duplicate research when targets share a `storyIdentity`.
+3. If resolution reports `story_identity_collision`, stop and report the
    collision rather than selecting either story.
 4. Inspect current research with `inspect_news_board_story_research`.
-5. For one section, request the compact view. Copy the fields from its
-   `writeContext` into the top level of
-   `validate_news_board_story_research_section`; do not send a nested
-   `writeContext` object.
-6. Copy the same top-level write fields and the returned `validatedSection`
-   into `save_news_board_story_research_section`. This supports first-section
+5. For one section, request the compact view. Copy `writeContext` directly into
+   the top level of `validate_news_board_story_research_section`, then add
+   `sectionId` and `section`; do not send a nested `writeContext` object.
+6. Copy the same `writeContext` and the returned `validatedSection` into
+   `save_news_board_story_research_section`. This supports first-section
    creation and never fabricates other sections.
 7. Treat a successful save response, including `status: "unchanged"`, as
    sufficient preservation confirmation. Inspect again only when subsequent
    work needs package content.
+
+Research Desk tabs are output buckets, and Copy Instructions are shortcuts into
+the same model. Map natural asks to the existing section before compact
+inspection or writing:
+
+- Facts for verified briefing.
+- Sources for evidence collateral used by other buckets.
+- Images for 1-2 current references for every main story subject, including
+  found provider images, user-supplied workspace visuals, and agent-generated
+  visual references or briefs before they become finished creative outputs. If
+  generating an image with real people or places, first search for current
+  likeness/location references and use them to match the subjects as closely as
+  possible.
+- Comments for individual public reactions.
+- Angles for editorial approaches.
+- Caveats for unresolved risks.
+- Designs for finished Generated Designs and workspace/design creation, with
+  templates as starting points, not a persisted suggestions section.
 
 Use the connected agent's permitted web, search, or browser tools for public
 research. Never fabricate inaccessible evidence or send private Desk Rules
@@ -54,11 +72,11 @@ evidence as top-level request fields.
 
 ## Designs
 
-- Create a new editable design from saved research only through
+- Create a new editable Generated Design from saved research only through
   `create_design_from_story_research` after inspecting candidates and the
   selected template's fields and validating fills with
   `prepare_template_autofill`.
-- Use canonical `mediaCandidateId` for saved image candidates.
+- Use canonical `mediaCandidateId` only for saved/importable image candidates.
 - Read creation results from `creationSummary` and use its exact preview
   operation for visual QA.
 - Edit an existing design through Agent Draft: prepare context, start a draft,
