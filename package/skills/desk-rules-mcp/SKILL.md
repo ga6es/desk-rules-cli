@@ -1,6 +1,6 @@
 ---
 name: desk-rules-mcp
-description: Operate Desk Rules MCP for authorization, Rules, News Board research, editable design creation and editing, export, and publication preparation.
+description: Operate Desk Rules MCP for authorization, the Design Rule, News Board research, editable design creation and editing, export, and publication preparation.
 ---
 
 # Desk Rules MCP
@@ -9,11 +9,10 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
 
 ## Authority
 
-- Treat live tool schemas, `inspect_mcp_authorization_status`, and the
-  applicable `inspect_rules` result as authoritative.
+- Treat live tool schemas and `inspect_mcp_authorization_status` as authoritative.
 - Run one fresh authorization inspection before planning writes. It satisfies
   the initial billing and capability gate unless account state changes.
-- Stop on unavailable billing, capability, Rules, provider, or publication
+- Stop on unavailable billing, capability, provider, or publication
   gates and follow the bounded recovery returned by the server.
 - Keep requests self-contained. Desk Rules MCP does not rely on hidden session
   state between calls.
@@ -32,43 +31,62 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
 3. If resolution reports `story_identity_collision`, stop and report the
    collision rather than selecting either story.
 4. Inspect current research with `inspect_news_board_story_research`.
-5. For one section, request the compact view. Copy `writeContext` directly into
-   the top level of `validate_news_board_story_research_section`, then add
-   `sectionId` and `section`; do not send a nested `writeContext` object.
-6. Copy the same `writeContext` and the returned `validatedSection` into
-   `save_news_board_story_research_section`. This supports first-section
-   creation and never fabricates other sections.
+5. Use the connected agent's own skills and permitted public research tools to
+   prepare one complete current package for Facts, Angles, and
+   Caveats responsibilities. Facts owns inline citations and original-source
+   attribution. Keep useful secondary reporting as Facts evidence, but trace
+   the graphic Source to the underlying original when possible. When that
+   directly inspected original explicitly credits joint reporting, include
+   every confirmed reporting partner in the single Source attribution label.
+   Do not infer partners or include aggregators. Angles contains exactly three
+   plain-language social graphic packages ordered from strongest to weakest,
+   and the one Facts-established Source when available. Rank them by hook
+   strength, visual potential, audience interest, and conversation potential
+   without weakening factual or sourcing safeguards. Caveats contains at most four
+   concise publishing guardrails. Keep each to 35 words, two sentences, and
+   280 characters; name the risky claim or framing and the action needed before
+   publication. Do not repeat Facts or invent warnings; use an empty list when
+   no material publishing risk remains.
+6. Copy the inspected `expectedUpdatedAt`, `packageFingerprint`, and
+   `freshnessToken` into `save_news_board_story_research`, and submit the
+   complete package under `package`. Section validation and section-save tools
+   are retired.
 7. Treat a successful save response, including `status: "unchanged"`, as
    sufficient preservation confirmation. Inspect again only when subsequent
    work needs package content.
 
-Research Desk tabs are output buckets, and Copy Instructions are shortcuts into
-the same model. Map natural asks to the existing section before compact
-inspection or writing:
+Research Desk tabs display the fixed responsibilities. They do not create
+independent write operations:
 
 - Facts for verified briefing.
-- Sources for evidence collateral used by other buckets.
-- Images for 1-2 current references for every main story subject, including
-  found provider images, user-supplied workspace visuals, and agent-generated
-  visual references or briefs before they become finished creative outputs. If
-  generating an image with real people or places, first search for current
-  likeness/location references and use them to match the subjects as closely as
-  possible.
-- Comments for individual public reactions.
 - Angles for editorial approaches.
-- Caveats for unresolved risks.
+- Caveats for publishing guardrails.
+
+Optional `mediaLeads` belongs beside `package`, never in `researchResult`.
+Omitted or empty leads preserve the retained Media library. Supply up to twenty
+ordered image/video leads to add up to ten surviving private previews, deduplicated
+across searches. The library shows images before videos, newest additions first
+within each type, in pages of thirty. Desk Rules processes leads
+without a model call and returns sanitized nonfatal warnings if Media fails after
+text is saved. Media stays outside text fingerprints and automatic template filling.
+Users may explicitly attach retained images as Studio references.
+Supplied leads have no discovery charge. Find media is a separate five-credit
+action for every completed search, including empty or duplicate-only results;
+saving Research never starts discovery automatically.
+Uploaded design assets, generation, and editing remain separate operations.
+- Do not send retired `images`, `imageCandidates`, `imageFill`,
+  `imageCandidateId`, or `mediaCandidateId` fields. The server returns
+  `research_images_retired`; use uploaded images, Studio generation, or editor
+  image tools as separate operations.
 - Designs for finished Generated Designs and workspace/design creation, with
   templates as starting points, not a persisted suggestions section.
 
 Use the connected agent's permitted web, search, or browser tools for public
 research. Never fabricate inaccessible evidence or send private Desk Rules
-context to external services. For Reddit comments, follow the returned
-`researchCommentContract`, use direct comment permalinks, and preserve
-`scoreStatus` exactly.
+context to external services.
 
-For full-package saves, use the inspected story target, package concurrency
-fields, current Rules fingerprint, research result, and any permitted quality
-evidence as top-level request fields.
+For saves, use exactly one complete package plus the inspected freshness fields.
+Do not send retired rule state, partial sections, or nested `writeContext` objects.
 
 ## Designs
 
@@ -76,7 +94,6 @@ evidence as top-level request fields.
   `create_design_from_story_research` after inspecting candidates and the
   selected template's fields and validating fills with
   `prepare_template_autofill`.
-- Use canonical `mediaCandidateId` only for saved/importable image candidates.
 - Read creation results from `creationSummary` and use its exact preview
   operation for visual QA.
 - Edit an existing design through Agent Draft: prepare context, start a draft,

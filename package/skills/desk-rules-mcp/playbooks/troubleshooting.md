@@ -1,10 +1,12 @@
 # Troubleshooting
 
-1. Run `inspect_mcp_authorization_status` and inspect only the relevant Rules.
+1. Run `inspect_mcp_authorization_status` and inspect the Design Rule only
+   when the requested workflow uses it.
 2. Follow the returned blocker and recovery path; do not bypass account,
-   billing, provider, Rules, or publication gates.
-3. For stale writes, reinspect and copy the refreshed `writeContext` directly
-   into the next request's top level, then add the requested section fields.
+   billing, provider, Design Rule, or publication gates.
+3. For stale Research writes, reinspect the story research and copy the
+   refreshed `expectedUpdatedAt`, `packageFingerprint`, and `freshnessToken`
+   into one complete `save_news_board_story_research` request.
 4. For setup or bundle problems, use the Desk Rules plugin or the currently
    published CLI doctor from the release notes.
 5. For Codex configuration, preview `deskrules mcp repair codex` and apply only

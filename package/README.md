@@ -32,7 +32,7 @@ skills into host-specific folders or grant Desk Rules write authorization.
 - Current CLI contract: `0.2.2`
 - Minimum compatible CLI contract: `0.2.2`
 - Current plugin and bundled skill contract: `0.2.2`
-- MCP manifest: `2026-08-17.story-identity-v1`
+- MCP manifest: `2026-09-04.current-research`
 - Protocol: MCP `2026-07-28` with automatic stateless legacy fallback
 
 Run `mcp doctor` when a server, plugin, CLI, or skill bundle looks stale. The
@@ -45,8 +45,8 @@ CLI test command.
 Desk Rules MCP owns authorization, private workspace inspection, research
 persistence, template validation, editable design operations, export, and
 publication preparation. The connected agent supplies its own permitted public
-web, search, or browser tools. Account > Agent > Rules remains the configurable
-instruction source.
+web, search, or browser tools. Account > Agent > Design Rule remains the
+configurable design-selection instruction source.
 
 The starter profile covers common inspection and workflow operations. Agents
 copy canonical configs and write tokens from inspection rather than guessing
