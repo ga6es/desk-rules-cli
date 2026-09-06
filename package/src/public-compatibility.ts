@@ -30,7 +30,7 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
     updateContract:
       "CLI, plugins, skills, docs, smoke tests, and Account UI consume the public compatibility contract instead of inventing release metadata.",
   },
-  manifestVersion: "2026-08-17.story-identity-v1",
+  manifestVersion: "2026-09-04.current-research",
   profiles: {
     starterTools: [
       "inspect_mcp_authorization_status",
@@ -39,11 +39,9 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
       "inspect_news_board_story_targets",
       "inspect_news_board_story",
       "inspect_news_board_story_research",
-      "validate_news_board_story_research_section",
       "inspect_news_board_saved_research_history",
       "inspect_news_board_saved_research_item",
       "save_news_board_story_research",
-      "save_news_board_story_research_section",
       "inspect_template_candidates",
       "inspect_template_fields",
       "prepare_template_autofill",

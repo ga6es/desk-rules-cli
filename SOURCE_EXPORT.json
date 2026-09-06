@@ -58,7 +58,7 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "45dd0321841e4d77e62c173d8bd6f9a38ba710a666ca640950a016249e478ce3"
+      "sha256": "0b29008471b4b2214cc42240344d601f3c08afc9fee3a3c8fcf8fb5c68bfb73a"
     },
     {
       "path": "package/package.json",
@@ -66,7 +66,7 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "11c0dc2a7646890e8b3e23dbf5e023d107b121da81140209dd7f283f345427a2"
+      "sha256": "b711dfca6661195aa80d42cff64050364174b191bf82e3b0c5615cc74542f030"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
@@ -78,15 +78,15 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/first-safe-check.md",
-      "sha256": "46f73c50733e4cd3d47fc2a6144dfadea26494d3af266a673c2fa95a08087e28"
+      "sha256": "a1d327aa4c53d0668b2721d95f956f8159862cb2ceb00ac8fe2beeac2592c0c9"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
-      "sha256": "c1fcc9dfe3e5fa0649408ca820292426e6503b84d5307e53dae03e61a4d9bdd1"
+      "sha256": "b9609c51cc3b49d9a935c61bb81ab079ea1e1f922401ca32b95062c76291aaaa"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
-      "sha256": "a520a96a8687048a77bf9ed09cdec25fb364e67136a86da9c761353d71c89fdd"
+      "sha256": "7e940a6ce08613c7e3e3f3e4a995739bba197a287dd8fb5359be5b5fc1f25f69"
     },
     {
       "path": "package/src/codex-config-repair.ts",
@@ -98,7 +98,7 @@
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "9270bffd467dfa460da8a8dbf9f20f98553d08e0f7115b52cbc44907636dc120"
+      "sha256": "13c233b05f5517747dd4fa61dd58fe471542173773424abc3a31bf1853f4c2fd"
     },
     {
       "path": "package/src/oauth-metadata.ts",
@@ -106,7 +106,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "2ce0597179cd4267d95934254afd902565afa8fb6b1ddb8c06b91da08180b9dc"
+      "sha256": "2a6373f72bb7211941cef8289c9711201edd2ede7c6c6aef1b967967f58c5dbf"
     },
     {
       "path": "package/tsconfig.json",
@@ -127,7 +127,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "8c5f0d81abb2dc03ea1c64f91d717c3d6a299fe4",
+    "commit": "7323cfce3b27a68533434399092017c7d61e0555",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
