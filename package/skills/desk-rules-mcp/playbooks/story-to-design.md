@@ -1,10 +1,10 @@
 # Story To Design
 
-Use this workflow for News Board research and a new editable design.
+Use this workflow for Board research and a new editable design.
 
 ## Research
 
-1. Run `inspect_mcp_authorization_status`; stop if live News Board research is
+1. Run `inspect_mcp_authorization_status`; stop if live Board research is
    unavailable.
 2. Inspect the private story context and current complete Research package.
 3. Resolve each `storyIdentity` or story URL independently with

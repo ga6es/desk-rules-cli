@@ -20,6 +20,7 @@ import {
   DESK_RULES_MCP_SERVER_MANIFEST,
   DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES,
 } from "./manifest.js"
+import { parseSafeMcpUrl } from "./safe-mcp-url.js"
 
 const MAX_CODEX_CONFIG_BYTES = 1_000_000
 const INVALID_SERVICE_TIER = "default"
@@ -29,10 +30,12 @@ export type CodexConfigDiagnosticCode =
   | "config_not_regular"
   | "config_not_utf8"
   | "config_too_large"
+  | "custom_server_name"
   | "desk_rules_block_missing"
   | "healthy"
   | "invalid_service_tier"
   | "malformed_toml"
+  | "multiple_desk_rules_blocks"
   | "restricted_starter_profile"
   | "stale_enabled_tools"
   | "custom_enabled_tools"
@@ -130,8 +133,16 @@ function isTableHeader(line: string) {
   return /^\s*\[\[?.+\]\]?\s*(?:#.*)?$/.test(line)
 }
 
-function recognizedServerNames() {
-  return new Set<string>([DESK_RULES_MCP_SERVER_MANIFEST.serverName])
+function isCanonicalDeskRulesEndpoint(value: unknown) {
+  if (typeof value !== "string") return false
+  const actual = parseSafeMcpUrl(value)
+  if (!actual) return false
+  const canonical = new URL(DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint)
+  const normalizePath = (path: string) => path.replace(/\/+$/, "") || "/"
+  return (
+    actual.origin === canonical.origin &&
+    normalizePath(actual.pathname) === normalizePath(canonical.pathname)
+  )
 }
 
 function renderStarterProfile(newline: string) {
@@ -228,6 +239,193 @@ function blockedPlan(
   }
 }
 
+type ResolvedServer = {
+  config: Record<string, unknown>
+  name: string
+}
+
+function resolveDeskRulesServer(
+  servers: Record<string, unknown>,
+): ResolvedServer | CodexConfigDiagnosticCode {
+  const canonicalName = DESK_RULES_MCP_SERVER_MANIFEST.serverName
+  const candidateNames = Object.keys(servers).filter((name) => {
+    const config = servers[name]
+    return (
+      name === canonicalName ||
+      (isRecord(config) && isCanonicalDeskRulesEndpoint(config.url))
+    )
+  })
+  if (candidateNames.length === 0) return "desk_rules_block_missing"
+  if (candidateNames.length !== 1) return "multiple_desk_rules_blocks"
+  const name = candidateNames[0]!
+  const config = servers[name]
+  if (!isRecord(config)) return "unsupported_desk_rules_block"
+  if (
+    typeof config.command === "string" ||
+    Array.isArray(config.args) ||
+    typeof config.cwd === "string" ||
+    !isCanonicalDeskRulesEndpoint(config.url)
+  ) {
+    return "unsupported_desk_rules_block"
+  }
+  return { config, name }
+}
+
+type ResolvedSourceBlock = {
+  blockEnd: number
+  enabledToolsLines: SourceLine[]
+  urlLines: SourceLine[]
+}
+
+function resolveServerSourceBlock(
+  source: string,
+  serverName: string,
+): ResolvedSourceBlock | null {
+  const lines = splitSourceLines(source)
+  const matchingHeaders = lines
+    .map((line, index) => ({ index, name: readMcpServerName(line.content) }))
+    .filter((entry) => entry.name === serverName)
+  if (matchingHeaders.length !== 1) return null
+  const headerLine = lines[matchingHeaders[0]!.index]!
+  const nextHeader = lines
+    .slice(matchingHeaders[0]!.index + 1)
+    .find((line) => isTableHeader(line.content))
+  const blockEnd = nextHeader?.start ?? source.length
+  const blockLines = lines.filter(
+    (line) => line.start >= headerLine.end && line.start < blockEnd,
+  )
+  return {
+    blockEnd,
+    enabledToolsLines: blockLines.filter((line) =>
+      /^\s*enabled_tools\s*=/.test(line.content),
+    ),
+    urlLines: blockLines.filter((line) => /^\s*url\s*=/.test(line.content)),
+  }
+}
+
+type ProfileEditPlan = {
+  actions: CodexConfigRepairAction[]
+  diagnostics: CodexConfigDiagnosticCode[]
+  edits: SourceEdit[]
+}
+
+function createStarterProfileEdit(source: string, blockEnd: number) {
+  const newline = source.includes("\r\n") ? "\r\n" : "\n"
+  const leading =
+    blockEnd > 0 && !source.slice(0, blockEnd).endsWith("\n") ? newline : ""
+  return {
+    end: blockEnd,
+    replacement: `${leading}${renderStarterProfile(newline)}`,
+    start: blockEnd,
+  }
+}
+
+function planProfileEdits(input: {
+  blockEnd: number
+  enabledToolsLines: SourceLine[]
+  profileIntent: CodexConfigProfileIntent
+  serverConfig: Record<string, unknown>
+  source: string
+}): ProfileEditPlan | null {
+  const actions: CodexConfigRepairAction[] = []
+  const diagnostics: CodexConfigDiagnosticCode[] = []
+  const edits: SourceEdit[] = []
+  if (!Object.hasOwn(input.serverConfig, "enabled_tools")) {
+    if (input.profileIntent !== "starter") return { actions, diagnostics, edits }
+    actions.push("replace_enabled_tools")
+    edits.push(createStarterProfileEdit(input.source, input.blockEnd))
+    return { actions, diagnostics, edits }
+  }
+  if (
+    input.enabledToolsLines.length !== 1 ||
+    !Array.isArray(input.serverConfig.enabled_tools) ||
+    !input.serverConfig.enabled_tools.every((name) => typeof name === "string")
+  ) {
+    return null
+  }
+  const line = input.enabledToolsLines[0]!
+  const assignmentEnd = findArrayAssignmentEnd(
+    input.source,
+    line.start,
+    input.blockEnd,
+  )
+  if (assignmentEnd === null) return null
+  const tools = input.serverConfig.enabled_tools as string[]
+  const starter =
+    tools.length === DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES.length &&
+    tools.every(
+      (name, index) => name === DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES[index],
+    )
+  diagnostics.push(
+    starter
+      ? "restricted_starter_profile"
+      : input.profileIntent === "preserve"
+        ? "custom_enabled_tools"
+        : "stale_enabled_tools",
+  )
+  if (input.profileIntent === "full") {
+    actions.push("remove_enabled_tools")
+    edits.push({ end: assignmentEnd, replacement: "", start: line.start })
+  } else if (input.profileIntent === "starter" && !starter) {
+    const newline = input.source.includes("\r\n") ? "\r\n" : "\n"
+    actions.push("replace_enabled_tools")
+    edits.push({
+      end: assignmentEnd,
+      replacement: renderStarterProfile(newline),
+      start: line.start,
+    })
+  }
+  return { actions, diagnostics, edits }
+}
+
+function finalizeCodexConfigPlan(input: {
+  actions: CodexConfigRepairAction[]
+  diagnostics: CodexConfigDiagnosticCode[]
+  edits: SourceEdit[]
+  hasBom: boolean
+  source: string
+  sourceWithOptionalBom: string
+}) {
+  if (input.diagnostics.includes("invalid_service_tier")) {
+    return {
+      actions: input.actions,
+      diagnostics: input.diagnostics,
+      safeToApply: false,
+      sourceHash: fingerprint(input.sourceWithOptionalBom),
+      status: "blocked",
+      updatedSource: null,
+    } satisfies CodexConfigRepairPlan
+  }
+  if (input.actions.length === 0) {
+    return {
+      actions: [],
+      diagnostics:
+        input.diagnostics.length > 0 ? input.diagnostics : ["healthy"],
+      safeToApply: true,
+      sourceHash: fingerprint(input.sourceWithOptionalBom),
+      status: "healthy",
+      updatedSource: input.sourceWithOptionalBom,
+    } satisfies CodexConfigRepairPlan
+  }
+  const updatedSource = applySourceEdits(input.source, input.edits)
+  try {
+    parse(updatedSource)
+  } catch {
+    return blockedPlan([
+      ...input.diagnostics,
+      "unsupported_desk_rules_block",
+    ])
+  }
+  return {
+    actions: input.actions,
+    diagnostics: input.diagnostics,
+    safeToApply: true,
+    sourceHash: fingerprint(input.sourceWithOptionalBom),
+    status: "fixable",
+    updatedSource: input.hasBom ? `\uFEFF${updatedSource}` : updatedSource,
+  } satisfies CodexConfigRepairPlan
+}
+
 export function planCodexConfigRepair(
   sourceWithOptionalBom: string,
   profileIntent: CodexConfigProfileIntent = "preserve",
@@ -250,12 +448,8 @@ export function planCodexConfigRepair(
   }
 
   const servers = isRecord(parsed.mcp_servers) ? parsed.mcp_servers : {}
-  const recognizedNames = recognizedServerNames()
-  const candidateNames = Object.keys(servers).filter((name) =>
-    recognizedNames.has(name),
-  )
-
-  if (candidateNames.length === 0) {
+  const resolvedServer = resolveDeskRulesServer(servers)
+  if (resolvedServer === "desk_rules_block_missing") {
     return {
       actions: [],
       diagnostics: [...diagnostics, "desk_rules_block_missing"],
@@ -265,153 +459,42 @@ export function planCodexConfigRepair(
       updatedSource: null,
     } satisfies CodexConfigRepairPlan
   }
-  const serverName = candidateNames[0]!
-  const serverConfig = servers[serverName]
-  if (!isRecord(serverConfig)) {
-    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
+  if (typeof resolvedServer === "string") {
+    return blockedPlan([...diagnostics, resolvedServer])
   }
+  const sourceBlock = resolveServerSourceBlock(source, resolvedServer.name)
   if (
-    typeof serverConfig.command === "string" ||
-    Array.isArray(serverConfig.args) ||
-    typeof serverConfig.cwd === "string"
+    !sourceBlock ||
+    sourceBlock.urlLines.length !== 1 ||
+    sourceBlock.enabledToolsLines.length > 1
   ) {
     return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
   }
-  if (typeof serverConfig.url !== "string") {
+  const { blockEnd, enabledToolsLines } = sourceBlock
+  if (resolvedServer.name !== DESK_RULES_MCP_SERVER_MANIFEST.serverName) {
+    diagnostics.push("custom_server_name")
+  }
+  const profilePlan = planProfileEdits({
+    blockEnd,
+    enabledToolsLines,
+    profileIntent,
+    serverConfig: resolvedServer.config,
+    source,
+  })
+  if (!profilePlan) {
     return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
   }
+  diagnostics.push(...profilePlan.diagnostics)
+  const { actions, edits } = profilePlan
 
-  const lines = splitSourceLines(source)
-  const matchingHeaders = lines
-    .map((line, index) => ({ index, name: readMcpServerName(line.content) }))
-    .filter((entry) => entry.name === serverName)
-  if (matchingHeaders.length !== 1) {
-    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-  }
-
-  const headerIndex = matchingHeaders[0]!.index
-  const headerLine = lines[headerIndex]!
-  const nextHeader = lines
-    .slice(headerIndex + 1)
-    .find((line) => isTableHeader(line.content))
-  const blockEnd = nextHeader?.start ?? source.length
-  const blockLines = lines.filter(
-    (line) => line.start >= headerLine.end && line.start < blockEnd,
-  )
-  const urlLines = blockLines.filter((line) => /^\s*url\s*=/.test(line.content))
-  const enabledToolsLines = blockLines.filter((line) =>
-    /^\s*enabled_tools\s*=/.test(line.content),
-  )
-
-  if (urlLines.length !== 1 || enabledToolsLines.length > 1) {
-    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-  }
-
-  const actions: CodexConfigRepairAction[] = []
-  const edits: SourceEdit[] = []
-  if (
-    serverConfig.url !== DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint
-  ) {
-    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-  }
-
-  if (Object.hasOwn(serverConfig, "enabled_tools")) {
-    if (enabledToolsLines.length !== 1 || !Array.isArray(serverConfig.enabled_tools)) {
-      return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-    }
-    const enabledToolsLine = enabledToolsLines[0]!
-    const assignmentEnd = findArrayAssignmentEnd(
-      source,
-      enabledToolsLine.start,
-      blockEnd,
-    )
-    if (assignmentEnd === null) {
-      return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-    }
-    const enabledTools = serverConfig.enabled_tools
-    if (!enabledTools.every((toolName) => typeof toolName === "string")) {
-      return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-    }
-    const matchesStarterProfile =
-      enabledTools.length === DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES.length &&
-      enabledTools.every(
-        (toolName, index) =>
-          toolName === DESK_RULES_MCP_STARTER_PROFILE_TOOL_NAMES[index],
-      )
-    diagnostics.push(
-      matchesStarterProfile
-        ? "restricted_starter_profile"
-        : profileIntent === "preserve"
-          ? "custom_enabled_tools"
-          : "stale_enabled_tools",
-    )
-
-    if (profileIntent === "full") {
-      actions.push("remove_enabled_tools")
-      edits.push({
-        end: assignmentEnd,
-        replacement: "",
-        start: enabledToolsLine.start,
-      })
-    } else if (profileIntent === "starter" && !matchesStarterProfile) {
-      const newline = source.includes("\r\n") ? "\r\n" : "\n"
-      actions.push("replace_enabled_tools")
-      edits.push({
-        end: assignmentEnd,
-        replacement: renderStarterProfile(newline),
-        start: enabledToolsLine.start,
-      })
-    }
-  } else if (profileIntent === "starter") {
-    const newline = source.includes("\r\n") ? "\r\n" : "\n"
-    const needsLeadingNewline =
-      blockEnd > 0 && !source.slice(0, blockEnd).endsWith("\n")
-    actions.push("replace_enabled_tools")
-    edits.push({
-      end: blockEnd,
-      replacement: `${needsLeadingNewline ? newline : ""}${renderStarterProfile(newline)}`,
-      start: blockEnd,
-    })
-  }
-
-  if (diagnostics.includes("invalid_service_tier")) {
-    return {
-      actions,
-      diagnostics,
-      safeToApply: false,
-      sourceHash: fingerprint(sourceWithOptionalBom),
-      status: "blocked",
-      updatedSource: null,
-    } satisfies CodexConfigRepairPlan
-  }
-
-  if (actions.length === 0) {
-    return {
-      actions: [],
-      diagnostics:
-        diagnostics.length > 0 ? diagnostics : ["healthy"],
-      safeToApply: true,
-      sourceHash: fingerprint(sourceWithOptionalBom),
-      status: "healthy",
-      updatedSource: sourceWithOptionalBom,
-    } satisfies CodexConfigRepairPlan
-  }
-
-  const updatedSource = applySourceEdits(source, edits)
-  try {
-    parse(updatedSource)
-  } catch {
-    return blockedPlan([...diagnostics, "unsupported_desk_rules_block"])
-  }
-
-  return {
+  return finalizeCodexConfigPlan({
     actions,
     diagnostics,
-    safeToApply: true,
-    sourceHash: fingerprint(sourceWithOptionalBom),
-    status: "fixable",
-    updatedSource: hasBom ? `\uFEFF${updatedSource}` : updatedSource,
-  } satisfies CodexConfigRepairPlan
+    edits,
+    hasBom,
+    source,
+    sourceWithOptionalBom,
+  })
 }
 
 export function resolveCodexConfigPath(overridePath: string | null) {

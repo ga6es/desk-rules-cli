@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "973be2eafc09ea23c08da421ebe5d075dc2e29be80aa4c4e9cabe956c89c3f8d"
+      "sha256": "8d4b89f687866d3851decc3b29a480ee0136abc4b4a7a3493fb4e82078c552d5"
     },
     {
       "path": "package.json",
@@ -58,15 +58,15 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "0b29008471b4b2214cc42240344d601f3c08afc9fee3a3c8fcf8fb5c68bfb73a"
+      "sha256": "a7993d568de2fc07de3aa778189c0fc9f1aac7670330787980ec97707e15a4f9"
     },
     {
       "path": "package/package.json",
-      "sha256": "fa6c545fb2d8e77320eba09ce45f44a978d94cbdfc1467ecd57d3c0acfc05c6b"
+      "sha256": "0805f750eb100a5d50a1efab217b440807f381ffda1f2a0d95269fca7f6c3759"
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "b711dfca6661195aa80d42cff64050364174b191bf82e3b0c5615cc74542f030"
+      "sha256": "643fa696f79fe923f5c927e9664958ee700f42ac66da8fedbabd2f7d71dab474"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
@@ -82,7 +82,7 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
-      "sha256": "b9609c51cc3b49d9a935c61bb81ab079ea1e1f922401ca32b95062c76291aaaa"
+      "sha256": "82ef9cebd2e7537aa97147656431b3471160fde53425dd3f5d340ca35772981c"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
@@ -90,11 +90,11 @@
     },
     {
       "path": "package/src/codex-config-repair.ts",
-      "sha256": "36758d44dc9fd7e59f79e34f1ff45f0c65fe8004484554eee47100ec7894b7c3"
+      "sha256": "0753bf961f48bca44235255cddb9daab19209fa8f0586f80804d56a5ea29d24d"
     },
     {
       "path": "package/src/index.ts",
-      "sha256": "5a16907f155c632b97afe1a61dc6805efcfb090578c6fc428d0bf31861266cdc"
+      "sha256": "5a488721e1516565e113595c179d53c435d7687d338911d6bf73c937dd09604d"
     },
     {
       "path": "package/src/manifest.ts",
@@ -106,7 +106,11 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "2a6373f72bb7211941cef8289c9711201edd2ede7c6c6aef1b967967f58c5dbf"
+      "sha256": "6175268c29f2829600637a7f8a6a1ad33fddb0f3b854814d3edd5743d59a551b"
+    },
+    {
+      "path": "package/src/safe-mcp-url.ts",
+      "sha256": "84e874e00f0ccb2dd39ff5c3c4674f41bcb4a4720efa589ebca812bcdc5b9328"
     },
     {
       "path": "package/tsconfig.json",
@@ -114,7 +118,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "ccb2208ca75f4ba7030cd9b9c79e974c299d277d8bb74166f05a0237cc1d76e7"
+      "sha256": "1b767acf2d3fa14967414eacf5a1410c1a56fa1ffee329027910ee228695b6f2"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -122,12 +126,12 @@
     },
     {
       "path": "tests/cli.test.ts",
-      "sha256": "e9d6829baffe27375e79a0f9d437ab62bf949b36acd12c8bcbca4cb840f858e0"
+      "sha256": "742f08b0581e50026a110bd38c48de41b9df87f637715e8a510268ce1e9e0209"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "7323cfce3b27a68533434399092017c7d61e0555",
+    "commit": "0c9597366e2aadc8d2ae9d1e5c12f2cbc4a47221",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
