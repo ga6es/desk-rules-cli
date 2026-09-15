@@ -95,7 +95,7 @@ test("built CLI reports its offline compatibility and bundled skill", async () =
   const manifestModule = await import(manifestModuleUrl)
   const skillsVersion =
     manifestModule.DESK_RULES_MCP_SERVER_MANIFEST.compatibility
-      .minimumSkillsVersion as string
+      .currentSkillsVersion as string
   const doctor = spawnSync(
     process.execPath,
     ["package/dist/index.js", "mcp", "doctor", "--offline"],

@@ -17,8 +17,9 @@ import {
   DESK_RULES_MCP_SERVER_MANIFEST,
 } from "./manifest.js"
 import { inspectAuthorizationServerMetadata } from "./oauth-metadata.js"
+import { parseSafeMcpUrl } from "./safe-mcp-url.js"
 
-type CliCheckStatus = "fail" | "pass" | "warn"
+type CliCheckStatus = "fail" | "not_checked" | "pass" | "warn"
 
 type CliCheck = {
   message: string
@@ -47,6 +48,10 @@ const DEFAULT_TIMEOUT_MS = 10_000
 const PUBLIC_DOCS_ORIGIN = "https://deskrules.com"
 const DOCS_PATH = "/docs/mcp"
 const PROMPT_DOCS_PATH = "/docs/mcp/prompt.md"
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value)
+}
 
 function readCurrentCliVersion() {
   const packageMetadata = JSON.parse(
@@ -295,155 +300,81 @@ async function fetchJsonWithTimeout(url: string) {
   return { json, response }
 }
 
-async function runDoctor(flags: Map<string, string | true>) {
-  const endpoint = readEndpoint(flags)
-  const offline = hasFlag(flags, "offline")
-  const checks: CliCheck[] = []
-  let liveEndpointIsSafe = false
-
-  try {
-    const parsedEndpoint = new URL(endpoint)
-    const isLocalEndpoint =
-      parsedEndpoint.hostname === "localhost" ||
-      parsedEndpoint.hostname === "127.0.0.1"
-    liveEndpointIsSafe =
-      parsedEndpoint.protocol === "https:" || isLocalEndpoint
-
-    checks.push({
-      message: `${endpoint} is a valid ${parsedEndpoint.protocol.replace(":", "")} URL.`,
+function inspectDoctorEndpoint(endpoint: string) {
+  const parsedEndpoint = parseSafeMcpUrl(endpoint, { allowLocalHttp: true })
+  const safe = parsedEndpoint !== null
+  return {
+    check: {
+      message: safe
+        ? `${endpoint} is a valid ${parsedEndpoint.protocol.replace(":", "")} URL.`
+        : "Endpoint URL is unsafe or invalid. No live request was made.",
       name: "endpoint url",
-      status:
-        liveEndpointIsSafe ? "pass" : "fail",
-    })
-  } catch {
-    checks.push({
-      message: `${endpoint} is not a valid MCP endpoint URL.`,
-      name: "endpoint url",
-      status: "fail",
-    })
+      status: safe ? ("pass" as const) : ("fail" as const),
+    },
+    displayEndpoint: safe ? endpoint : null,
+    safe,
   }
+}
 
-  addVersionCheck(
-    checks,
-    "CLI",
-    readFlag(flags, "cli-version") ?? CURRENT_CLI_VERSION,
-    DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumCliVersion,
-  )
-  addVersionCheck(
-    checks,
-    "Plugin",
-    readFlag(flags, "plugin-version"),
-    DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumPluginVersion,
-  )
-  addVersionCheck(
-    checks,
-    "Skills",
-    readFlag(flags, "skills-version"),
-    DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumSkillsVersion,
-  )
+function addDoctorVersionChecks(checks: CliCheck[], flags: Map<string, string | true>) {
+  for (const [label, actual, minimum] of [
+    ["CLI", readFlag(flags, "cli-version") ?? CURRENT_CLI_VERSION, DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumCliVersion],
+    ["Plugin", readFlag(flags, "plugin-version"), DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumPluginVersion],
+    ["Skills", readFlag(flags, "skills-version"), DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumSkillsVersion],
+  ] as const) {
+    addVersionCheck(checks, label, actual, minimum)
+  }
+}
 
+function addDoctorClientConfigCheck(checks: CliCheck[], flags: Map<string, string | true>) {
   const client = readFlag(flags, "client")
-  if (client && client !== "codex") {
+  if (!client) return
+  if (client !== "codex") {
     checks.push({
       message: "Only the codex client diagnostic is currently supported.",
       name: "client config",
       status: "fail",
     })
-  } else if (client === "codex") {
-    const configPath = resolveCodexConfigPath(readFlag(flags, "config"))
-    const plan = inspectCodexConfigFile(configPath)
-    checks.push(...createCodexConfigChecks(plan))
+    return
   }
+  const configPath = resolveCodexConfigPath(readFlag(flags, "config"))
+  checks.push(...createCodexConfigChecks(inspectCodexConfigFile(configPath)))
+}
 
-  if (offline) {
-    checks.push({
-      message: "Skipped live metadata and auth-gate checks because --offline was supplied.",
-      name: "live metadata",
-      status: "warn",
-    })
-    return { checks, endpoint }
-  }
-  if (!liveEndpointIsSafe) {
-    checks.push({
-      message:
-        "Skipped live metadata and auth-gate checks because the endpoint URL is unsafe.",
-      name: "live metadata",
-      status: "warn",
-    })
-    return { checks, endpoint }
-  }
-
+async function addDoctorMetadataChecks(checks: CliCheck[], endpoint: string) {
   try {
     const metadataUrl = createProtectedResourceMetadataUrl(endpoint)
     const { json, response } = await fetchJsonWithTimeout(metadataUrl)
-    const metadata =
-      json && typeof json === "object" ? (json as Record<string, unknown>) : {}
+    const metadata = isRecord(json) ? json : {}
     const authorizationServers = metadata.authorization_servers
     const resource = metadata.resource
-
-    checks.push({
-      message: `Protected-resource metadata returned HTTP ${response.status}.`,
-      name: "protected-resource metadata",
-      status: response.ok ? "pass" : "fail",
+    checks.push(
+      {
+        message: `Protected-resource metadata returned HTTP ${response.status}.`,
+        name: "protected-resource metadata",
+        status: response.ok ? "pass" : "fail",
+      },
+      {
+        message: Array.isArray(authorizationServers)
+          ? "Metadata includes authorization_servers."
+          : "Metadata is missing authorization_servers.",
+        name: "authorization servers",
+        status: Array.isArray(authorizationServers) ? "pass" : "fail",
+      },
+      {
+        message:
+          resource === endpoint
+            ? "Metadata resource matches the MCP endpoint."
+            : `Metadata resource is ${String(resource)}; expected ${endpoint}.`,
+        name: "resource origin",
+        status: resource === endpoint ? "pass" : "fail",
+      },
+    )
+    const auth = await inspectAuthorizationServerMetadata({
+      authorizationServers,
+      fetchJson: fetchJsonWithTimeout,
     })
-    checks.push({
-      message: Array.isArray(authorizationServers)
-        ? "Metadata includes authorization_servers."
-        : "Metadata is missing authorization_servers.",
-      name: "authorization servers",
-      status: Array.isArray(authorizationServers) ? "pass" : "fail",
-    })
-    checks.push({
-      message:
-        resource === endpoint
-          ? "Metadata resource matches the MCP endpoint."
-          : `Metadata resource is ${String(resource)}; expected ${endpoint}.`,
-      name: "resource origin",
-      status: resource === endpoint ? "pass" : "fail",
-    })
-    const authorizationInspection =
-      await inspectAuthorizationServerMetadata({
-        authorizationServers,
-        fetchJson: fetchJsonWithTimeout,
-      })
-    checks.push({
-      message: `Authorization-server metadata returned HTTP ${authorizationInspection.metadataHttpStatus}.`,
-      name: "authorization server metadata",
-      status:
-        authorizationInspection.metadataHttpStatus >= 200 &&
-        authorizationInspection.metadataHttpStatus < 300
-          ? "pass"
-          : "fail",
-    })
-    checks.push({
-      message: authorizationInspection.issuerMatches
-        ? "Authorization-server metadata issuer matches protected-resource discovery."
-        : "Authorization-server issuer changed or does not match. Reconnect Desk Rules MCP instead of reusing cached client registration.",
-      name: "authorization server issuer",
-      status: authorizationInspection.issuerMatches ? "pass" : "fail",
-    })
-    checks.push({
-      message: authorizationInspection.pkceS256Supported
-        ? "Authorization server supports PKCE S256."
-        : "Authorization server does not advertise required PKCE S256 support.",
-      name: "authorization server PKCE",
-      status: authorizationInspection.pkceS256Supported ? "pass" : "fail",
-    })
-    checks.push({
-      message:
-        authorizationInspection.clientRegistrationMode ===
-        "client_id_metadata_document"
-          ? "Authorization server supports Client ID Metadata Documents."
-          : authorizationInspection.clientRegistrationMode ===
-              "dynamic_client_registration"
-            ? "Authorization server supports Dynamic Client Registration as the compatibility fallback."
-            : "Authorization server requires a pre-registered or manually supplied client.",
-      name: "client registration",
-      status:
-        authorizationInspection.clientRegistrationMode === "manual"
-          ? "warn"
-          : "pass",
-    })
+    addAuthorizationMetadataChecks(checks, auth)
   } catch (error) {
     checks.push({
       message: `Could not complete OAuth metadata discovery: ${error instanceof Error ? error.message : String(error)}`,
@@ -451,19 +382,56 @@ async function runDoctor(flags: Map<string, string | true>) {
       status: "fail",
     })
   }
+}
 
+function addAuthorizationMetadataChecks(
+  checks: CliCheck[],
+  auth: Awaited<ReturnType<typeof inspectAuthorizationServerMetadata>>,
+) {
+  const metadataPass = auth.metadataHttpStatus >= 200 && auth.metadataHttpStatus < 300
+  checks.push(
+    {
+      message: `Authorization-server metadata returned HTTP ${auth.metadataHttpStatus}.`,
+      name: "authorization server metadata",
+      status: metadataPass ? "pass" : "fail",
+    },
+    {
+      message: auth.issuerMatches
+        ? "Authorization-server metadata issuer matches protected-resource discovery."
+        : "Authorization-server issuer changed or does not match. Reconnect Desk Rules MCP instead of reusing cached client registration.",
+      name: "authorization server issuer",
+      status: auth.issuerMatches ? "pass" : "fail",
+    },
+    {
+      message: auth.pkceS256Supported
+        ? "Authorization server supports PKCE S256."
+        : "Authorization server does not advertise required PKCE S256 support.",
+      name: "authorization server PKCE",
+      status: auth.pkceS256Supported ? "pass" : "fail",
+    },
+    {
+      message:
+        auth.clientRegistrationMode === "client_id_metadata_document"
+          ? "Authorization server supports Client ID Metadata Documents."
+          : auth.clientRegistrationMode === "dynamic_client_registration"
+            ? "Authorization server supports Dynamic Client Registration as the compatibility fallback."
+            : "Authorization server requires a pre-registered or manually supplied client.",
+      name: "client registration",
+      status: auth.clientRegistrationMode === "manual" ? "warn" : "pass",
+    },
+  )
+}
+
+async function addDoctorAuthGateCheck(checks: CliCheck[], endpoint: string) {
   try {
-    const response = await fetchWithTimeout(endpoint, {
-      method: "GET",
-    })
+    const response = await fetchWithTimeout(endpoint, { method: "GET" })
     checks.push({
       message:
         response.status === 401
           ? "Unauthenticated MCP request returned expected HTTP 401."
           : `Unauthenticated MCP request returned HTTP ${response.status}; expected 401.`,
       name: "auth gate",
-      status:
-        response.status === 401 ? "pass" : response.status >= 500 ? "fail" : "warn",
+      status: response.status === 401 ? "pass" : response.status >= 500 ? "fail" : "warn",
     })
   } catch (error) {
     checks.push({
@@ -472,8 +440,65 @@ async function runDoctor(flags: Map<string, string | true>) {
       status: "fail",
     })
   }
+}
 
-  return { checks, endpoint }
+function addHostOwnedDoctorStages(checks: CliCheck[]) {
+  checks.push(
+    {
+      message:
+        "Doctor cannot inspect the host OAuth session. Log in again only when authentication is missing or invalid.",
+      name: "host OAuth session",
+      status: "not_checked",
+    },
+    {
+      message:
+        "Run tools/list in the active task. Refresh or open a new task when discovery changed.",
+      name: "active-task tools/list",
+      status: "not_checked",
+    },
+    {
+      message:
+        "Call inspect_mcp_authorization_status from the authenticated task to verify current permissions and readiness.",
+      name: "authorization inspection",
+      status: "not_checked",
+    },
+  )
+}
+
+async function runDoctor(flags: Map<string, string | true>) {
+  const endpoint = readEndpoint(flags)
+  const offline = hasFlag(flags, "offline")
+  const checks: CliCheck[] = []
+  const endpointInspection = inspectDoctorEndpoint(endpoint)
+  checks.push(endpointInspection.check)
+  addDoctorVersionChecks(checks, flags)
+  addDoctorClientConfigCheck(checks, flags)
+
+  if (offline) {
+    checks.push({
+      message: "Skipped live metadata and auth-gate checks because --offline was supplied.",
+      name: "live metadata",
+      status: "warn",
+    })
+    addHostOwnedDoctorStages(checks)
+    return { checks, endpoint: endpointInspection.displayEndpoint }
+  }
+  if (!endpointInspection.safe) {
+    checks.push({
+      message:
+        "Skipped live metadata and auth-gate checks because the endpoint URL is unsafe.",
+      name: "live metadata",
+      status: "warn",
+    })
+    addHostOwnedDoctorStages(checks)
+    return { checks, endpoint: endpointInspection.displayEndpoint }
+  }
+
+  await addDoctorMetadataChecks(checks, endpoint)
+  await addDoctorAuthGateCheck(checks, endpoint)
+
+  addHostOwnedDoctorStages(checks)
+  return { checks, endpoint: endpointInspection.displayEndpoint }
 }
 
 function readCodexConfigDiagnosticMessage(code: CodexConfigDiagnosticCode) {
@@ -486,6 +511,8 @@ function readCodexConfigDiagnosticMessage(code: CodexConfigDiagnosticCode) {
       "Codex config is not valid UTF-8. Repair refused.",
     config_too_large:
       "Codex config exceeds the bounded diagnostic size. Repair refused.",
+    custom_server_name:
+      "A custom-named MCP block uses the canonical Desk Rules endpoint. Its name is preserved.",
     desk_rules_block_missing:
       "No recognized Desk Rules MCP block was found. Run `deskrules mcp setup codex`.",
     healthy:
@@ -494,6 +521,8 @@ function readCodexConfigDiagnosticMessage(code: CodexConfigDiagnosticCode) {
       "The global service_tier value `default` is unsupported. Remove that line manually; Desk Rules repair will not change global Codex settings.",
     malformed_toml:
       "Codex config is malformed TOML. Repair refused; fix the syntax or restore a known-good backup.",
+    multiple_desk_rules_blocks:
+      "Multiple possible Desk Rules MCP blocks were found. Repair refused; keep exactly one canonical-endpoint block.",
     restricted_starter_profile:
       "The recognized Desk Rules block uses the current explicit starter profile.",
     stale_enabled_tools:
@@ -515,6 +544,7 @@ function createCodexConfigChecks(plan: CodexConfigRepairPlan): CliCheck[] {
         ? "pass"
         : code === "restricted_starter_profile" ||
             code === "custom_enabled_tools" ||
+            code === "custom_server_name" ||
             code === "config_missing" ||
             code === "desk_rules_block_missing"
           ? "warn"
@@ -525,7 +555,13 @@ function createCodexConfigChecks(plan: CodexConfigRepairPlan): CliCheck[] {
 function printChecks(checks: readonly CliCheck[]) {
   for (const check of checks) {
     const label =
-      check.status === "pass" ? "PASS" : check.status === "warn" ? "WARN" : "FAIL"
+      check.status === "pass"
+        ? "PASS"
+        : check.status === "warn"
+          ? "WARN"
+          : check.status === "not_checked"
+            ? "NOT_CHECKED"
+            : "FAIL"
     process.stdout.write(`${label} ${check.name}: ${check.message}\n`)
   }
 }
@@ -539,7 +575,7 @@ async function printDoctor(flags: Map<string, string | true>) {
   const payload = {
     billingPath: DESK_RULES_MCP_SERVER_MANIFEST.recoveryPaths.billing,
     checks: result.checks,
-    docsUrl: createDocsUrl(result.endpoint),
+    docsUrl: `${PUBLIC_DOCS_ORIGIN}${DOCS_PATH}`,
     endpoint: result.endpoint,
     expectedManifestVersion: DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion,
     pricingPath: DESK_RULES_MCP_SERVER_MANIFEST.recoveryPaths.pricing,
@@ -551,7 +587,7 @@ async function printDoctor(flags: Map<string, string | true>) {
     process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`)
   } else {
     process.stdout.write("Desk Rules MCP doctor\n")
-    process.stdout.write(`Endpoint: ${result.endpoint}\n`)
+    process.stdout.write(`Endpoint: ${result.endpoint ?? "[unsafe endpoint omitted]"}\n`)
     process.stdout.write(
       `Expected package manifest: ${payload.expectedManifestVersion}\n`,
     )

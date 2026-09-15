@@ -1,6 +1,6 @@
 ---
 name: desk-rules-mcp
-description: Operate Desk Rules MCP for authorization, the Design Rule, News Board research, editable design creation and editing, export, and publication preparation.
+description: Operate Desk Rules MCP for authorization, the Design Rule, Board research, editable design creation and editing, export, and publication preparation.
 ---
 
 # Desk Rules MCP
@@ -47,10 +47,10 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
    280 characters; name the risky claim or framing and the action needed before
    publication. Do not repeat Facts or invent warnings; use an empty list when
    no material publishing risk remains.
-6. Copy the inspected `expectedUpdatedAt`, `packageFingerprint`, and
-   `freshnessToken` into `save_news_board_story_research`, and submit the
-   complete package under `package`. Section validation and section-save tools
-   are retired.
+6. Fill `packageSkeleton`; validate it; then pass top-level `expectedUpdatedAt`,
+   `packageFingerprint`, and `freshnessToken` to the save tool. Fresh
+   stories use null revisions. On stale context, re-inspect and rebuild.
+   Partial-section tools are retired and absent from discovery.
 7. Treat a successful save response, including `status: "unchanged"`, as
    sufficient preservation confirmation. Inspect again only when subsequent
    work needs package content.
