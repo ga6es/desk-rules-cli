@@ -30,7 +30,15 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
    ones, and avoid duplicate research when targets share a `storyIdentity`.
 3. If resolution reports `story_identity_collision`, stop and report the
    collision rather than selecting either story.
-4. Inspect current research with `inspect_news_board_story_research`.
+4. Choose factual Research for a headline, excerpt, and source without Angles.
+   Inspect with `inspect_news_board_story_factual_research`, fill its
+   `packageSkeleton`, validate with `validate_news_board_story_factual_research`,
+   then save with `save_news_board_story_factual_research`. Send `package` and
+   top-level `expectedUpdatedAt`, `artifactFingerprint`, and `freshnessToken`
+   exactly as returned by inspection. New artifacts use null revision fields;
+   on stale context, re-inspect and rebuild. Skip steps 5–6 for factual saves.
+   For complete Research, inspect with `inspect_news_board_story_research`
+   and follow steps 5–6.
 5. Use the connected agent's own skills and permitted public research tools to
    prepare one complete current package for Facts, Angles, and
    Caveats responsibilities. Facts owns inline citations and original-source
@@ -55,14 +63,14 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
    sufficient preservation confirmation. Inspect again only when subsequent
    work needs package content.
 
-Research Desk tabs display the fixed responsibilities. They do not create
+Complete Research Desk tabs display the fixed responsibilities. They do not create
 independent write operations:
 
 - Facts for verified briefing.
 - Angles for editorial approaches.
 - Caveats for publishing guardrails.
 
-Optional `mediaLeads` belongs beside `package`, never in `researchResult`.
+For complete Research, optional `mediaLeads` belongs beside `package`, never in `researchResult`.
 Omitted or empty leads preserve the retained Media library. Supply up to twenty
 ordered image/video leads to add up to ten surviving private previews, deduplicated
 across searches. The library shows images before videos, newest additions first
@@ -85,11 +93,15 @@ Use the connected agent's permitted web, search, or browser tools for public
 research. Never fabricate inaccessible evidence or send private Desk Rules
 context to external services.
 
-For saves, use exactly one complete package plus the inspected freshness fields.
+For saves, use exactly one package of the chosen Research type plus its inspected
+freshness fields. Factual saves use `artifactFingerprint`; complete saves use
+`packageFingerprint`. Do not mix the contracts.
 Do not send retired rule state, partial sections, or nested `writeContext` objects.
 
 ## Designs
 
+- Factual Research alone cannot create a design. Expand it to a fully validated
+  and saved complete Research package first.
 - Create a new editable Generated Design from saved research only through
   `create_design_from_story_research` after inspecting candidates and the
   selected template's fields and validating fills with

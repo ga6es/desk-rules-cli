@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "8d4b89f687866d3851decc3b29a480ee0136abc4b4a7a3493fb4e82078c552d5"
+      "sha256": "d2ee4e3935e5ffd7f67fda0d2c8a640bb7705c20c56e5dc2643580b4440cb6fe"
     },
     {
       "path": "package.json",
@@ -58,15 +58,15 @@
     },
     {
       "path": "package/README.md",
-      "sha256": "a7993d568de2fc07de3aa778189c0fc9f1aac7670330787980ec97707e15a4f9"
+      "sha256": "16779a43645707c0280056965423f6f687d6a40b1e083c2bb6d6562704d34e2c"
     },
     {
       "path": "package/package.json",
-      "sha256": "0805f750eb100a5d50a1efab217b440807f381ffda1f2a0d95269fca7f6c3759"
+      "sha256": "df79bd5a5cf1afc7bed429044964bc5e12a30d6668cf4a6d53290f3e9aafbf06"
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "643fa696f79fe923f5c927e9664958ee700f42ac66da8fedbabd2f7d71dab474"
+      "sha256": "49b7386fe84b9d03021e28311b08fde39d0e2e95c26a771ebfd5b7d20c7fe2bd"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
@@ -82,7 +82,7 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
-      "sha256": "82ef9cebd2e7537aa97147656431b3471160fde53425dd3f5d340ca35772981c"
+      "sha256": "22947c13ae39d90399e794a61af7f2c02590cccca1850abf6707bc0690cfd00b"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
@@ -98,7 +98,7 @@
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "13c233b05f5517747dd4fa61dd58fe471542173773424abc3a31bf1853f4c2fd"
+      "sha256": "46adfa2166975d9864b911a5c82c80cde3e57519dabd693d8403d2bc5e6933d1"
     },
     {
       "path": "package/src/oauth-metadata.ts",
@@ -106,7 +106,7 @@
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "6175268c29f2829600637a7f8a6a1ad33fddb0f3b854814d3edd5743d59a551b"
+      "sha256": "6cc0271300f9e2da41d3a5f8e5b32aec02083088c7504aae7f1bc268538e7485"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
@@ -118,7 +118,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "1b767acf2d3fa14967414eacf5a1410c1a56fa1ffee329027910ee228695b6f2"
+      "sha256": "b724e655d275546a569c556340871cc7c5901f3c97e059fd0f23c879c639a9c4"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -131,7 +131,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "0c9597366e2aadc8d2ae9d1e5c12f2cbc4a47221",
+    "commit": "e1d06914296b57e85445e3f765b9fa6731fb7f90",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }
