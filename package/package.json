@@ -1,7 +1,7 @@
 {
   "name": "@desk-rules/cli",
-  "version": "0.2.4",
-  "description": "Desk Rules MCP setup, diagnostics, and update guidance.",
+  "version": "0.5.0",
+  "description": "Authenticated Desk Rules MCP client, setup, diagnostics, and update guidance.",
   "type": "module",
   "private": false,
   "homepage": "https://deskrules.com/docs/mcp",
@@ -43,6 +43,9 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
+    "@modelcontextprotocol/client": "2.0.0",
+    "@napi-rs/keyring": "2.1.0",
+    "open": "11.0.0",
     "smol-toml": "1.7.1"
   }
 }

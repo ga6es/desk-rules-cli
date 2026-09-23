@@ -51,6 +51,7 @@ export const DESK_RULES_MCP_SERVER_MANIFEST = {
 } as const
 
 export const DESK_RULES_MCP_READ_FIRST_TOOL_NAMES = [
+  "inspect_mcp_capabilities",
   "inspect_mcp_authorization_status",
   "inspect_rules",
   "list_recent_designs",
