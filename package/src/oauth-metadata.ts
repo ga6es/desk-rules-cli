@@ -1,10 +1,10 @@
-const PRIVATE_IPV4_PATTERN =
-  /^(?:10\.|127\.|169\.254\.|192\.168\.|172\.(?:1[6-9]|2\d|3[01])\.)/
+import { isIP } from "node:net"
 
 /**
  * OAuth discovery safety boundary:
- * Normalize discovery hosts before rejecting local/private endpoints, including
- * trailing-dot, bracketed IPv6, and IPv4-mapped forms.
+ * Remote OAuth requires a named host, not IP literals or local hostnames.
+ * Normalize trailing-dot and bracketed forms before classification. This is a
+ * literal-host policy, not DNS resolution or rebinding protection.
  */
 function normalizeUrlHostname(hostname: string) {
   const normalized = hostname.toLowerCase().replace(/\.$/, "")
@@ -12,25 +12,14 @@ function normalizeUrlHostname(hostname: string) {
   return bracketed?.[1] ?? normalized
 }
 
-function isPrivateIpv6Host(hostname: string) {
-  if (hostname === "::" || hostname === "::1") return true
-  if (hostname.startsWith("::ffff:")) {
-    return true
-  }
-  const firstHextet = hostname.split(":")[0]
-  const first = Number.parseInt(firstHextet, 16)
-  if (!Number.isFinite(first)) return false
-  const isUniqueLocal = (first & 0xfe00) === 0xfc00
-  const isLinkLocal = (first & 0xffc0) === 0xfe80
-  return isUniqueLocal || isLinkLocal
-}
-
-function isUnsafeDiscoveryHostname(hostname: string) {
+export function isUnsafeDiscoveryHostname(hostname: string) {
   const normalized = normalizeUrlHostname(hostname)
   return (
     normalized === "localhost" ||
-    PRIVATE_IPV4_PATTERN.test(normalized) ||
-    isPrivateIpv6Host(normalized)
+    normalized.endsWith(".localhost") ||
+    normalized.endsWith(".local") ||
+    normalized.endsWith(".internal") ||
+    isIP(normalized) !== 0
   )
 }
 

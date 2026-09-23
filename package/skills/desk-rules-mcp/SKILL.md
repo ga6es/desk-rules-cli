@@ -9,94 +9,113 @@ Use the hosted endpoint `https://agents.deskrules.com/api/mcp`.
 
 ## Authority
 
-- Treat live tool schemas and `inspect_mcp_authorization_status` as authoritative.
-- Run one fresh authorization inspection before planning writes. It satisfies
-  the initial billing and capability gate unless account state changes.
-- Stop on unavailable billing, capability, provider, or publication
-  gates and follow the bounded recovery returned by the server.
-- Keep requests self-contained. Desk Rules MCP does not rely on hidden session
-  state between calls.
-- Host-generated callable aliases and separately configured MCP namespaces are
-  client-owned. Use the canonical operation names returned by Desk Rules.
+- `inspect_mcp_capabilities` is the versioned static record;
+  `inspect_mcp_authorization_status` is live account/provider state. Neither
+  grants writes.
+- Reinspect authorization before writes and after account changes. Stop on a
+  returned account, provider, or publication blocker and follow its recovery.
+- Keep calls self-contained and use canonical operation names. Client aliases
+  and duplicate namespaces remain client-owned.
+- CLI auth and tool execution never bypass MCP account, owner, workflow,
+  freshness, audit, billing, or provider checks.
 
 ## Research
 
-1. Resolve a `storyIdentity` such as `reddit:fullname:t3_...`,
-   `rss:source-entry:<sourceId>:<entryId>`, or a story URL by passing it as the
-   `query` to `inspect_news_board_story_targets`, then use its deterministic
-   inspection target with `inspect_news_board_story`.
-2. For multiple story identities, resolve them independently in request order.
-   Skip repeated identities, report each missing identity without blocking valid
-   ones, and avoid duplicate research when targets share a `storyIdentity`.
-3. If resolution reports `story_identity_collision`, stop and report the
-   collision rather than selecting either story.
-4. Choose factual Research for a headline, excerpt, and source without Angles.
-   Inspect with `inspect_news_board_story_factual_research`, fill its
-   `packageSkeleton`, validate with `validate_news_board_story_factual_research`,
-   then save with `save_news_board_story_factual_research`. Send `package` and
-   top-level `expectedUpdatedAt`, `artifactFingerprint`, and `freshnessToken`
-   exactly as returned by inspection. New artifacts use null revision fields;
-   on stale context, re-inspect and rebuild. Skip steps 5–6 for factual saves.
-   For complete Research, inspect with `inspect_news_board_story_research`
-   and follow steps 5–6.
-5. Use the connected agent's own skills and permitted public research tools to
-   prepare one complete current package for Facts, Angles, and
-   Caveats responsibilities. Facts owns inline citations and original-source
-   attribution. Keep useful secondary reporting as Facts evidence, but trace
-   the graphic Source to the underlying original when possible. When that
-   directly inspected original explicitly credits joint reporting, include
-   every confirmed reporting partner in the single Source attribution label.
-   Do not infer partners or include aggregators. Angles contains exactly three
-   plain-language social graphic packages ordered from strongest to weakest,
-   and the one Facts-established Source when available. Rank them by hook
-   strength, visual potential, audience interest, and conversation potential
-   without weakening factual or sourcing safeguards. Caveats contains at most four
-   concise publishing guardrails. Keep each to 35 words, two sentences, and
-   280 characters; name the risky claim or framing and the action needed before
-   publication. Do not repeat Facts or invent warnings; use an empty list when
-   no material publishing risk remains.
-6. Fill `packageSkeleton`; validate it; then pass top-level `expectedUpdatedAt`,
-   `packageFingerprint`, and `freshnessToken` to the save tool. Fresh
-   stories use null revisions. On stale context, re-inspect and rebuild.
-   Partial-section tools are retired and absent from discovery.
-7. Treat a successful save response, including `status: "unchanged"`, as
-   sufficient preservation confirmation. Inspect again only when subsequent
-   work needs package content.
+1. Resolve each story URL or `storyIdentity` with
+   `inspect_news_board_story_targets`, then inspect its deterministic target.
+   Preserve request order, skip repeats, report misses, and stop on
+   `story_identity_collision`.
+2. Choose one contract. For headline, excerpt, and source only, inspect factual
+   Research, fill its skeleton, validate, and save with top-level
+   `expectedUpdatedAt`, `artifactFingerprint`, and `freshnessToken`.
+   Complete Research starts from its complete inspector and uses
+   `packageFingerprint`. New artifacts use null revisions; stale responses
+   require reinspection. Both paths use zero AI credits but retain account,
+   authorization, owner, audit, and freshness gates.
+3. For complete Research, use permitted public research tools to produce one
+   current package. Facts owns verified claims, inline citations, and original
+   sourcing; keep secondary evidence but name confirmed joint original
+   reporters only. Angles contains exactly three distinct plain-language social
+   graphic packages, strongest first, and the Facts-established Source when
+   available. Caveats contains at most four publishing guardrails, each naming
+   the risky claim and required action; do not repeat Facts or invent warnings.
+4. Validate the complete `packageSkeleton`, then save it with the inspected
+   top-level revision, fingerprint, and freshness token. Partial-section tools
+   and nested `writeContext` are retired. A successful save, including
+   `status: "unchanged"`, confirms preservation.
 
-Complete Research Desk tabs display the fixed responsibilities. They do not create
-independent write operations:
+Complete Research Desk tabs are fixed responsibilities: Facts, Angles, and
+Caveats. Factual Research has no Angles and cannot create a design until expanded
+to a saved, validated complete package.
 
-- Facts for verified briefing.
-- Angles for editorial approaches.
-- Caveats for publishing guardrails.
+Research text saves reject media. Append one to twenty leads with
+`append_news_board_story_research_media`, exact fingerprints,
+`expectedUpdatedAt`, and a stable UUID. It adds at most ten deduplicated previews
+without changing text. Reuse the UUID for pending reconciliation; use a new one
+for a new attempt. Zero credits do not waive policy/freshness checks. Discovery
+remains charged; retained media stays outside autofill.
 
-For complete Research, optional `mediaLeads` belongs beside `package`, never in `researchResult`.
-Omitted or empty leads preserve the retained Media library. Supply up to twenty
-ordered image/video leads to add up to ten surviving private previews, deduplicated
-across searches. The library shows images before videos, newest additions first
-within each type, in pages of thirty. Desk Rules processes leads
-without a model call and returns sanitized nonfatal warnings if Media fails after
-text is saved. Media stays outside text fingerprints and automatic template filling.
-Users may explicitly attach retained images as Studio references.
-Supplied leads have no discovery charge. Find media is a separate five-credit
-action for every completed search, including empty or duplicate-only results;
-saving Research never starts discovery automatically.
-Uploaded design assets, generation, and editing remain separate operations.
-- Do not send retired `images`, `imageCandidates`, `imageFill`,
-  `imageCandidateId`, or `mediaCandidateId` fields. The server returns
-  `research_images_retired`; use uploaded images, Studio generation, or editor
-  image tools as separate operations.
-- Designs for finished Generated Designs and workspace/design creation, with
-  templates as starting points, not a persisted suggestions section.
+Do not send retired `images`, `imageCandidates`, `imageFill`,
+`imageCandidateId`, or `mediaCandidateId`; use uploaded media, Studio
+generation, or editor image tools separately after `research_images_retired`.
+Use only accessible evidence,
+never send private Desk Rules context to external services, and never fabricate
+sources.
 
-Use the connected agent's permitted web, search, or browser tools for public
-research. Never fabricate inaccessible evidence or send private Desk Rules
-context to external services.
+## Uploads Ingestion
 
-For saves, use exactly one package of the chosen Research type plus its inspected
-freshness fields. Factual saves use `artifactFingerprint`; complete saves use
-`packageFingerprint`. Do not mix the contracts.
-Do not send retired rule state, partial sections, or nested `writeContext` objects.
+- Local media: run
+  `deskrules media upload --file <path> --request-id <uuid> --approve-write`.
+  The path stays in the CLI; MCP receives basename, size, hash, and a stable
+  request ID before authenticated byte transfer. Batch files contain up to
+  eight `file`/`requestId` items.
+- Remote media: call `import_uploaded_assets_from_urls` with up to eight public
+  HTTPS URLs and external-write approval. Credentials, private destinations,
+  nonstandard ports, and HTTPS downgrades are rejected.
+- Each item and batch is capped at 50 MiB. Preserve request IDs across uncertain
+  retries; changed input under the same ID conflicts.
+- Ingestion is a direct, zero-AI-credit account action with normal access,
+  permission, owner, audit, approval, and media-verification gates. Reinspect
+  returned asset IDs and materialize their previews before design use.
+
+## Brand Asset Ingestion
+
+- Local: `deskrules brand upload --kind <logo|font> --label <label> --file
+<path> --request-id <uuid> --approve-write`. Paths stay local; batches allow
+  eight items.
+- Limits: logo 25 MiB; font 10 MiB; batch 25 MiB.
+- Remote: use `import_brand_assets_from_urls` for approved public HTTPS; retry
+  failures with the same request IDs.
+- The server verifies files; reinspect `inspect_brand_kit` before use. Existing
+  staged objects still use `register_brand_logo` or `register_brand_font`.
+
+## Product Feedback
+
+- Inspect `submit_workspace_feedback` and
+  `inspect_workspace_feedback_status` capability and live authorization before
+  writing. Feedback uses normal account, master-write, audit, and per-call
+  approval gates but consumes zero AI credits.
+- CLI: `deskrules feedback submit --summary <text> --report-file <path>
+--request-id <uuid> --approve-write`. The full UTF-8 report is preserved up
+  to 64 KiB. Add one `--attachment-file` or an `--attachments-file` JSON array
+  of up to eight paths or `file`/`requestId` records.
+- MCP clients prepare each manifest item with
+  `prepare_workspace_feedback_attachment_upload`, upload bytes only to its
+  returned same-origin path, then call `submit_workspace_feedback` with the
+  identical versioned report and manifest.
+- Evidence limits are 2 MiB per static PNG/JPEG/WebP screenshot, 64 KiB per
+  plain-text file, eight million image pixels, eight files, and 16 MiB total.
+  The server re-encodes images and rejects credential-like text, private URLs,
+  signed capabilities, type mismatches, and changed bytes.
+- Image processing cannot guarantee detection of secrets visible inside
+  screenshot pixels. Inspect the visible screenshot first and include it only
+  when the user explicitly authorizes that evidence.
+- Preserve the submission UUID and attachment request IDs across partial or
+  uncertain retries. Inspect the durable receipt instead of retrying under new
+  IDs. Receipt states distinguish `draft`/`stored` submission from `queued`,
+  `processing`, `dispatched`, `retryable`, `uncertain`, or `failed` delivery.
+  Private attachments stay out of Trello; only bounded triage context and the
+  evidence count are mirrored.
 
 ## Designs
 
@@ -126,11 +145,13 @@ Do not send retired rule state, partial sections, or nested `writeContext` objec
 ## Approval Boundaries
 
 - A user's request and current authorization are both required for writes.
+- CLI writes require per-call `--approve-write`; external writes require
+  `--approve-external`.
 - Export only when requested and available.
 - Publish only after explicit approval for the exact publication in the current
   conversation.
-- Keep output bounded and never expose raw records, documents, credentials,
-  provider payloads, storage paths, or billing details.
+- Keep output bounded; never expose raw records, credentials, provider payloads,
+  storage paths, signed capabilities, or billing details.
 
 ## Playbooks
 
@@ -138,4 +159,6 @@ Do not send retired rule state, partial sections, or nested `writeContext` objec
 - [story-to-design.md](playbooks/story-to-design.md)
 - [design-draft-preview.md](playbooks/design-draft-preview.md)
 - [export-and-publish.md](playbooks/export-and-publish.md)
+- [submit-feedback.md](playbooks/submit-feedback.md)
+- [image-generation.md](playbooks/image-generation.md)
 - [troubleshooting.md](playbooks/troubleshooting.md)

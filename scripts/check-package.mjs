@@ -3,11 +3,16 @@ import { readFileSync } from "node:fs"
 
 const metadata = JSON.parse(readFileSync("package/package.json", "utf8"))
 assert.equal(metadata.name, "@desk-rules/cli")
-assert.equal(metadata.version, "0.2.4")
+assert.equal(metadata.version, "0.5.0")
 assert.equal(metadata.license, "Apache-2.0")
 assert.equal(metadata.repository.url, "git+https://github.com/ga6es/desk-rules-cli.git")
 assert.equal(metadata.repository.directory, "package")
-assert.deepEqual(metadata.dependencies, { "smol-toml": "1.7.1" })
+assert.deepEqual(metadata.dependencies, {
+  "@modelcontextprotocol/client": "2.0.0",
+  "@napi-rs/keyring": "2.1.0",
+  "open": "11.0.0",
+  "smol-toml": "1.7.1",
+})
 assert.equal(metadata.scripts.postinstall, undefined)
 assert.deepEqual(metadata.files, [
   "dist",

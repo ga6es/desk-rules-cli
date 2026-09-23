@@ -1,32 +1,42 @@
 # Design Draft And Preview
 
-Use this playbook when a user asks the agent to inspect or edit an existing Desk
-Rules design.
+## Inspect
 
-## Inspect First
+1. Run `prepare_editor_action_context`, then inspect the page or document.
+2. Use targeted tools. `inspect_uploaded_asset_identities` returns IDs, names,
+   hashes and lineage.
+3. Inventories contain request descriptors, not capabilities. In the full
+   profile, use `inspect_design_resource_preview` for an upload/poster/logo and
+   `inspect_design_asset_crop` with `expectedUpdatedAt` for crop evidence.
+   Use `inspect_design_page_preview` for up to eight pages.
+4. Request `includePreview: true` only for pixels.
+   `pixels_materialized` proves delivery, not visual inspection; inspect the
+   native image before describing visible pixels.
 
-1. Run `prepare_editor_action_context` for the target design.
-2. Inspect the relevant page with `inspect_design_page` or
-   `inspect_design_document`.
-3. Use targeted inspection tools, such as `find_text_on_page`,
-   `inspect_design_assets`, `inspect_uploaded_assets`, `inspect_brand_kit`, or
-   `inspect_text_presets`.
+## Import Media Before Editing
 
-## Draft Before Commit
+1. For local media, run `deskrules media upload` with one stable request UUID
+   and `--approve-write`. For a local batch, use a bounded JSON batch file.
+2. For remote media, call `import_uploaded_assets_from_urls` with public HTTPS
+   URLs and external-write approval. Treat per-item failures as independent;
+   retry only failed items with their original request IDs.
+3. Reinspect each returned asset ID and materialize its preview. Ingestion is a
+   direct Uploads action; after verification, refer to the asset ID from either
+   a one-step direct edit or a typed Agent Draft action.
 
-1. Ask for approval before starting write-capable draft work if the requested
-   change is not already clear.
-2. Run `start_agent_draft`.
-3. Run `apply_actions_to_draft` with typed actions only.
-4. Use the returned draft state to run `preview_agent_draft_page`, then explain
-   the proposed change.
-5. Commit with `commit_agent_draft` only after explicit user approval.
-6. Discard with `discard_agent_draft` if the user rejects the change.
+## Draft And Commit
+
+1. Start a draft, inspect its action schema, then apply typed actions.
+2. Inspect `preview_agent_draft_page` image content. Use
+   `inspect_agent_draft_asset_crop` with the current draft version for crops.
+3. Commit only after explicit approval; discard rejected changes.
 
 ## Guardrails
 
-- Do not mutate the live design outside the Agent Draft commit step.
-- In the full profile, use `inspect_agent_draft` only to resume or recover a
-  draft when the latest apply or preview response is unavailable.
-- Preserve `expectedUpdatedAt`; re-inspect when stale.
-- Keep outputs bounded and user-facing.
+- Live changes occur only at Agent Draft commit.
+- Use `inspect_agent_draft` only for recovery; re-inspect stale state.
+- CLI image saves require explicit `--output-file` or `--output-directory`;
+  capabilities stay hidden; existing files are preserved.
+- Never pass a client filesystem path through MCP JSON. Do not retry an
+  uncertain ingest under a new request ID, and do not reuse an existing request
+  ID for different bytes or a different normalized URL.

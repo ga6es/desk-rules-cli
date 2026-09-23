@@ -7,6 +7,7 @@ import { test } from "node:test"
 // canonical public-repository template kept in the private monorepo.
 const oauthModuleUrl = new URL("../package/src/oauth-metadata.js", import.meta.url).href
 const repairModuleUrl = new URL("../package/src/codex-config-repair.js", import.meta.url).href
+const operationalModuleUrl = new URL("../package/src/operational-mcp.js", import.meta.url).href
 const manifestModuleUrl = new URL("../package/dist/manifest.js", import.meta.url).href
 const loadSourceModules = async () => {
   const [oauthModule, repairModule] = await Promise.all([
@@ -118,6 +119,45 @@ test("built CLI reports its offline compatibility and bundled skill", async () =
     skills.stdout,
     new RegExp(skillsVersion.replaceAll(".", "\\.")),
   )
+
+  const help = spawnSync(process.execPath, ["package/dist/index.js", "help"], {
+    encoding: "utf8",
+  })
+  assert.equal(help.status, 0, help.stderr)
+  assert.match(help.stdout, /deskrules auth login/)
+  assert.match(help.stdout, /deskrules mcp call <tool>/)
+})
+
+test("legacy commands do not load the optional native credential backend", () => {
+  const loaderUrl = new URL("./deny-keyring-loader.mjs", import.meta.url).href
+  const help = spawnSync(
+    process.execPath,
+    [
+      "--experimental-loader",
+      loaderUrl,
+      "package/dist/index.js",
+      "help",
+    ],
+    { encoding: "utf8" },
+  )
+  assert.equal(help.status, 0, help.stderr)
+  assert.match(help.stdout, /Desk Rules CLI/)
+})
+
+test("machine output withholds credentials and signed capabilities", async () => {
+  const { sanitizeMachineValue } = await import(operationalModuleUrl)
+  assert.deepEqual(
+    sanitizeMachineValue({
+      accessToken: "secret",
+      downloadUrl: "https://files.example/download?token=secret",
+      sourceUrl: "https://example.com/story?id=42",
+    }),
+    {
+      accessToken: "[withheld]",
+      downloadUrl: "[withheld]",
+      sourceUrl: "https://example.com/story?id=42",
+    },
+  )
 })
 
 test("breaking CLI rejects the removed mcp install alias", () => {
@@ -127,6 +167,7 @@ test("breaking CLI rejects the removed mcp install alias", () => {
     { encoding: "utf8" },
   )
   assert.equal(result.status, 1)
-  assert.match(result.stderr, /Unknown command: mcp install/)
+  assert.match(result.stderr, /Unknown command\./)
+  assert.doesNotMatch(result.stderr, /mcp install/)
   assert.doesNotMatch(result.stderr, /renamed to setup/)
 })

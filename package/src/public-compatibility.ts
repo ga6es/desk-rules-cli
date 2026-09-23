@@ -30,9 +30,10 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
     updateContract:
       "CLI, plugins, skills, docs, smoke tests, and Account UI consume the public compatibility contract instead of inventing release metadata.",
   },
-  manifestVersion: "2026-09-16.factual-research",
+  manifestVersion: "2026-09-22.agent-draft-recovery",
   profiles: {
     starterTools: [
+      "inspect_mcp_capabilities",
       "inspect_mcp_authorization_status",
       "inspect_rules",
       "inspect_news_board_source_catalog",
@@ -42,10 +43,9 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
       "inspect_news_board_story_factual_research",
       "validate_news_board_story_research",
       "validate_news_board_story_factual_research",
-      "inspect_news_board_saved_research_history",
-      "inspect_news_board_saved_research_item",
       "save_news_board_story_research",
       "save_news_board_story_factual_research",
+      "append_news_board_story_research_media",
       "inspect_template_candidates",
       "inspect_template_fields",
       "prepare_template_autofill",
@@ -58,12 +58,19 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
       "inspect_design_page",
       "inspect_design_page_preview",
       "inspect_uploaded_assets",
+      "import_uploaded_assets_from_urls",
       "inspect_brand_kit",
+      "import_brand_assets_from_urls",
+      "prepare_workspace_feedback_attachment_upload",
+      "submit_workspace_feedback",
+      "inspect_workspace_feedback_status",
       "inspect_export_options",
       "prepare_design_export",
       "inspect_publish_targets",
       "prepare_publish",
       "start_agent_draft",
+      "start_agent_draft_recovery",
+      "inspect_agent_draft_action_schema",
       "apply_actions_to_draft",
       "preview_agent_draft_page",
       "commit_agent_draft",
@@ -109,24 +116,24 @@ export const DESK_RULES_PUBLIC_COMPATIBILITY = {
   serverName: "desk-rules-mcp",
   versions: {
     cli: {
-      current: "0.2.4",
+      current: "0.5.0",
       minimumCompatible: "0.2.2",
-      published: "0.2.2",
+      published: "0.2.4",
     },
     plugin: {
-      current: "0.2.4",
+      current: "0.5.0",
       minimumCompatible: "0.2.2",
     },
     skills: {
-      current: "0.2.4",
+      current: "0.5.0",
       minimumCompatible: "0.2.2",
     },
   },
-} as const;
+} as const
 
 export function isDeskRulesPublicCliSetupAvailable(input: {
-  currentVersion: string;
-  publishedVersion: string;
+  currentVersion: string
+  publishedVersion: string
 }) {
-  return input.currentVersion === input.publishedVersion;
+  return input.currentVersion === input.publishedVersion
 }

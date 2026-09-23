@@ -30,7 +30,7 @@
     },
     {
       "path": "NOTICE",
-      "sha256": "f22f2e250109d609e94770868b7a96a60a60a9915dac8d245a45d1df9d5f955e"
+      "sha256": "baf0b042aa76b3e8e2e065e66c8032f46cb208ac4945e2049fd50f39b243b910"
     },
     {
       "path": "README.md",
@@ -42,7 +42,7 @@
     },
     {
       "path": "package-lock.json",
-      "sha256": "d2ee4e3935e5ffd7f67fda0d2c8a640bb7705c20c56e5dc2643580b4440cb6fe"
+      "sha256": "ce0cd51ea5d2bf95745ba16262cddd0696dc18b50379e0fb4e684d90b9050185"
     },
     {
       "path": "package.json",
@@ -54,23 +54,23 @@
     },
     {
       "path": "package/NOTICE",
-      "sha256": "f22f2e250109d609e94770868b7a96a60a60a9915dac8d245a45d1df9d5f955e"
+      "sha256": "baf0b042aa76b3e8e2e065e66c8032f46cb208ac4945e2049fd50f39b243b910"
     },
     {
       "path": "package/README.md",
-      "sha256": "16779a43645707c0280056965423f6f687d6a40b1e083c2bb6d6562704d34e2c"
+      "sha256": "23e0ce78b2d746960b6e8a53f4a68679f908dda6406009c61d176cf38dbb82c6"
     },
     {
       "path": "package/package.json",
-      "sha256": "df79bd5a5cf1afc7bed429044964bc5e12a30d6668cf4a6d53290f3e9aafbf06"
+      "sha256": "6a9cd2f6b97dbb5c273ed8a337d5a167c6afc4747a5e52ff233e143f7a8aeb71"
     },
     {
       "path": "package/skills/desk-rules-mcp/SKILL.md",
-      "sha256": "49b7386fe84b9d03021e28311b08fde39d0e2e95c26a771ebfd5b7d20c7fe2bd"
+      "sha256": "f6d95e7f5724281bee91831e3b6a049b5c58be482b8b134162c8a1fd6c65868a"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/design-draft-preview.md",
-      "sha256": "b0c7ac1a55427473955ad8db84d0c0b78709c3aaae08857e566367a64ed25764"
+      "sha256": "bed2b41897f5ed05e08dfe953bbaf5a4de417a97ef6903e2114fe49b8d56c606"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/export-and-publish.md",
@@ -78,39 +78,83 @@
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/first-safe-check.md",
-      "sha256": "a1d327aa4c53d0668b2721d95f956f8159862cb2ceb00ac8fe2beeac2592c0c9"
+      "sha256": "0f5702c9ba44c461d45640218ec086a745653100756fcf46e2553dc7436229d3"
+    },
+    {
+      "path": "package/skills/desk-rules-mcp/playbooks/image-generation.md",
+      "sha256": "690fcf60caaf94868236bbb4a30a89d9fc897a12fd972ec658e665f8da2230e9"
     },
     {
       "path": "package/skills/desk-rules-mcp/playbooks/story-to-design.md",
       "sha256": "22947c13ae39d90399e794a61af7f2c02590cccca1850abf6707bc0690cfd00b"
     },
     {
+      "path": "package/skills/desk-rules-mcp/playbooks/submit-feedback.md",
+      "sha256": "1b4537a1bb1c60c32f6d13ec3135a445d8ff17de3428430b08ca8645dca3b1d9"
+    },
+    {
       "path": "package/skills/desk-rules-mcp/playbooks/troubleshooting.md",
-      "sha256": "7e940a6ce08613c7e3e3f3e4a995739bba197a287dd8fb5359be5b5fc1f25f69"
+      "sha256": "494be166711c35e640011b6a62daa723d78cdb845d851a5b446a94fd3921c7ee"
     },
     {
       "path": "package/src/codex-config-repair.ts",
       "sha256": "0753bf961f48bca44235255cddb9daab19209fa8f0586f80804d56a5ea29d24d"
     },
     {
+      "path": "package/src/feedback.ts",
+      "sha256": "c661e7d7dae721c064f6c37516a8cbb171709b60f6597835f5de40ecccec5137"
+    },
+    {
+      "path": "package/src/image-files.ts",
+      "sha256": "6106646669ba53dc043e8eaf65ea48dc9fb6ab1ad74cd948e44eda8ec539dd29"
+    },
+    {
       "path": "package/src/index.ts",
-      "sha256": "5a488721e1516565e113595c179d53c435d7687d338911d6bf73c937dd09604d"
+      "sha256": "b0f98b934a180e9f29072c69417629ca56142d7cd781e93d9485f1072ed7644e"
     },
     {
       "path": "package/src/manifest.ts",
-      "sha256": "46adfa2166975d9864b911a5c82c80cde3e57519dabd693d8403d2bc5e6933d1"
+      "sha256": "fb853a7948d93cf3661ce3a2c5c00a744b1b0c0c2ad4e27583688d91d4387824"
+    },
+    {
+      "path": "package/src/media-upload.ts",
+      "sha256": "7493c058818b3f304e0703436564ed4a6e57ef19b05b2585dfc1570c7d5ce1f6"
     },
     {
       "path": "package/src/oauth-metadata.ts",
-      "sha256": "a07cabc5b31df105ae11ccdedf1316e5432073939dd663fc0e7d01843d1d48e4"
+      "sha256": "e0b52dba68ce23037318f3047706188b2600af58b68dfbe92ded91850444b32d"
+    },
+    {
+      "path": "package/src/oauth-session-safety.ts",
+      "sha256": "8e1fa04eeaf61a66edf9c932d8c972d6e1007bbc8423a77a97b5960c33e11ff9"
+    },
+    {
+      "path": "package/src/oauth-session.ts",
+      "sha256": "53aca8bcd14e09681e03f43cf2630c5055165ad765b5b74341f425ac9e27fd77"
+    },
+    {
+      "path": "package/src/operational-cli.ts",
+      "sha256": "2a249c3d58a3e8df8d36b0e31b98b27b698a3d0d036ad7c92f2abe0676ea6cfa"
+    },
+    {
+      "path": "package/src/operational-mcp.ts",
+      "sha256": "e9671e364dd794b72b563013ea088310196c1e820ea042483210ae538ef81327"
     },
     {
       "path": "package/src/public-compatibility.ts",
-      "sha256": "6cc0271300f9e2da41d3a5f8e5b32aec02083088c7504aae7f1bc268538e7485"
+      "sha256": "7f5087a183b7ac85f3b655dfb53f596d08c64742695550ce8b0065ea985d63f8"
     },
     {
       "path": "package/src/safe-mcp-url.ts",
       "sha256": "84e874e00f0ccb2dd39ff5c3c4674f41bcb4a4720efa589ebca812bcdc5b9328"
+    },
+    {
+      "path": "package/src/secure-credentials.ts",
+      "sha256": "f95139068b958204bf60cdb18e3641d13a4bbe604afcc44e6432227a68b8c9d0"
+    },
+    {
+      "path": "package/src/studio-reference-upload.ts",
+      "sha256": "3503f5903eeb313727e67901d1193d9d30f0cff812f2f95c24324561bf4a2850"
     },
     {
       "path": "package/tsconfig.json",
@@ -118,7 +162,7 @@
     },
     {
       "path": "scripts/check-package.mjs",
-      "sha256": "b724e655d275546a569c556340871cc7c5901f3c97e059fd0f23c879c639a9c4"
+      "sha256": "284d964d2adc0c3a286e8bd3ee656be70053a6989453a1f56beb324fa0aba9c9"
     },
     {
       "path": "scripts/verify-export.mjs",
@@ -126,12 +170,16 @@
     },
     {
       "path": "tests/cli.test.ts",
-      "sha256": "742f08b0581e50026a110bd38c48de41b9df87f637715e8a510268ce1e9e0209"
+      "sha256": "8c1cbd34bb84a6c19aec990058837dfc435854bc962338998ca207afcfc43560"
+    },
+    {
+      "path": "tests/deny-keyring-loader.mjs",
+      "sha256": "a3eb92e216840ebf48c17a4744cec5b44b4eb883f885bac65a9d753171ba7b0f"
     }
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "e1d06914296b57e85445e3f765b9fa6731fb7f90",
+    "commit": "36fcd14df309fd060a4e3705b75c875f2a487ae9",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

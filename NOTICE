@@ -3,6 +3,10 @@ Copyright 2026 Desk Rules contributors
 
 This product includes software developed by Desk Rules contributors.
 
+Runtime dependencies include the Model Context Protocol TypeScript client,
+@napi-rs/keyring, open, and smol-toml, each distributed under its respective
+MIT license.
+
 Desk Rules names, logos, and trademarks are not licensed under the Apache
 License 2.0 except as necessary for reasonable and customary use in describing
 the origin of this software.

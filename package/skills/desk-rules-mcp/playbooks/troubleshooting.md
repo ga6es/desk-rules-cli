@@ -1,9 +1,10 @@
 # Troubleshooting
 
-1. Run `inspect_mcp_authorization_status` and inspect the Design Rule only
-   when the requested workflow uses it.
-2. Follow the returned blocker and recovery path; do not bypass account,
-   billing, provider, Design Rule, or publication gates.
+1. Inspect static capability, then live authorization. Inspect the Design Rule
+   only when the workflow uses it.
+2. Follow the one returned recovery step: reinspect stale or unverifiable state,
+   correct invalid input, choose supported operations, and read back uncertain
+   results before retry. Never bypass account, provider, Rule, or approval gates.
 3. For stale Research writes, reinspect the story research and copy the
    refreshed `expectedUpdatedAt`, `packageFingerprint`, and `freshnessToken`
    into one complete `save_news_board_story_research` request.

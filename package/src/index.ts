@@ -316,17 +316,35 @@ function inspectDoctorEndpoint(endpoint: string) {
   }
 }
 
-function addDoctorVersionChecks(checks: CliCheck[], flags: Map<string, string | true>) {
+function addDoctorVersionChecks(
+  checks: CliCheck[],
+  flags: Map<string, string | true>,
+) {
   for (const [label, actual, minimum] of [
-    ["CLI", readFlag(flags, "cli-version") ?? CURRENT_CLI_VERSION, DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumCliVersion],
-    ["Plugin", readFlag(flags, "plugin-version"), DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumPluginVersion],
-    ["Skills", readFlag(flags, "skills-version"), DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumSkillsVersion],
+    [
+      "CLI",
+      readFlag(flags, "cli-version") ?? CURRENT_CLI_VERSION,
+      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumCliVersion,
+    ],
+    [
+      "Plugin",
+      readFlag(flags, "plugin-version"),
+      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumPluginVersion,
+    ],
+    [
+      "Skills",
+      readFlag(flags, "skills-version"),
+      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.minimumSkillsVersion,
+    ],
   ] as const) {
     addVersionCheck(checks, label, actual, minimum)
   }
 }
 
-function addDoctorClientConfigCheck(checks: CliCheck[], flags: Map<string, string | true>) {
+function addDoctorClientConfigCheck(
+  checks: CliCheck[],
+  flags: Map<string, string | true>,
+) {
   const client = readFlag(flags, "client")
   if (!client) return
   if (client !== "codex") {
@@ -388,7 +406,8 @@ function addAuthorizationMetadataChecks(
   checks: CliCheck[],
   auth: Awaited<ReturnType<typeof inspectAuthorizationServerMetadata>>,
 ) {
-  const metadataPass = auth.metadataHttpStatus >= 200 && auth.metadataHttpStatus < 300
+  const metadataPass =
+    auth.metadataHttpStatus >= 200 && auth.metadataHttpStatus < 300
   checks.push(
     {
       message: `Authorization-server metadata returned HTTP ${auth.metadataHttpStatus}.`,
@@ -431,7 +450,12 @@ async function addDoctorAuthGateCheck(checks: CliCheck[], endpoint: string) {
           ? "Unauthenticated MCP request returned expected HTTP 401."
           : `Unauthenticated MCP request returned HTTP ${response.status}; expected 401.`,
       name: "auth gate",
-      status: response.status === 401 ? "pass" : response.status >= 500 ? "fail" : "warn",
+      status:
+        response.status === 401
+          ? "pass"
+          : response.status >= 500
+            ? "fail"
+            : "warn",
     })
   } catch (error) {
     checks.push({
@@ -458,6 +482,12 @@ function addHostOwnedDoctorStages(checks: CliCheck[]) {
     },
     {
       message:
+        "Call inspect_mcp_capabilities from the authenticated task to verify the versioned static operation surface.",
+      name: "capability inspection",
+      status: "not_checked",
+    },
+    {
+      message:
         "Call inspect_mcp_authorization_status from the authenticated task to verify current permissions and readiness.",
       name: "authorization inspection",
       status: "not_checked",
@@ -476,7 +506,8 @@ async function runDoctor(flags: Map<string, string | true>) {
 
   if (offline) {
     checks.push({
-      message: "Skipped live metadata and auth-gate checks because --offline was supplied.",
+      message:
+        "Skipped live metadata and auth-gate checks because --offline was supplied.",
       name: "live metadata",
       status: "warn",
     })
@@ -507,8 +538,7 @@ function readCodexConfigDiagnosticMessage(code: CodexConfigDiagnosticCode) {
       "Codex user config was not found. Run `deskrules mcp setup codex` for a canonical block.",
     config_not_regular:
       "Codex config is not a regular file. Repair refused without reading or changing it.",
-    config_not_utf8:
-      "Codex config is not valid UTF-8. Repair refused.",
+    config_not_utf8: "Codex config is not valid UTF-8. Repair refused.",
     config_too_large:
       "Codex config exceeds the bounded diagnostic size. Repair refused.",
     custom_server_name:
@@ -579,15 +609,16 @@ async function printDoctor(flags: Map<string, string | true>) {
     endpoint: result.endpoint,
     expectedManifestVersion: DESK_RULES_MCP_SERVER_MANIFEST.manifestVersion,
     pricingPath: DESK_RULES_MCP_SERVER_MANIFEST.recoveryPaths.pricing,
-    protocolCompatibility:
-      DESK_RULES_MCP_SERVER_MANIFEST.protocolCompatibility,
+    protocolCompatibility: DESK_RULES_MCP_SERVER_MANIFEST.protocolCompatibility,
   }
 
   if (hasFlag(flags, "json")) {
     process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`)
   } else {
     process.stdout.write("Desk Rules MCP doctor\n")
-    process.stdout.write(`Endpoint: ${result.endpoint ?? "[unsafe endpoint omitted]"}\n`)
+    process.stdout.write(
+      `Endpoint: ${result.endpoint ?? "[unsafe endpoint omitted]"}\n`,
+    )
     process.stdout.write(
       `Expected package manifest: ${payload.expectedManifestVersion}\n`,
     )
@@ -614,7 +645,7 @@ async function printDoctor(flags: Map<string, string | true>) {
 }
 
 function printCodexSetup(args: CodexSetupArgs) {
-  const endpoint = readEndpoint(
+  const endpoint = readSafeSetupEndpoint(
     new Map(args.endpoint ? [["endpoint", args.endpoint]] : []),
   )
   const profileLines =
@@ -637,7 +668,7 @@ function printCodexSetup(args: CodexSetupArgs) {
       "Use this manual configuration only when the Desk Rules plugin is not installed:",
       "",
       "[mcp_servers.desk-rules-mcp]",
-      `url = "${endpoint}"`,
+      `url = ${JSON.stringify(endpoint)}`,
       'auth = "oauth"',
       'default_tools_approval_mode = "writes"',
       "tool_timeout_sec = 120",
@@ -648,7 +679,8 @@ function printCodexSetup(args: CodexSetupArgs) {
       args.profile === "full"
         ? DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.full.description
         : DESK_RULES_MCP_SERVER_MANIFEST.clientProfiles.default.description,
-      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.reconnectPolicy.permissionInvariant,
+      DESK_RULES_MCP_SERVER_MANIFEST.compatibility.reconnectPolicy
+        .permissionInvariant,
       `Docs: ${createDocsUrl(endpoint)}`,
       `Agent setup prompt: ${createPromptDocsUrl(endpoint)}`,
       "",
@@ -656,14 +688,21 @@ function printCodexSetup(args: CodexSetupArgs) {
   )
 }
 
+function readSafeSetupEndpoint(flags: Map<string, string | true>) {
+  const value = readEndpoint(flags)
+  const endpoint = parseSafeMcpUrl(value, { allowLocalHttp: true })
+  if (!endpoint || /[\s'"`$;&|<>\\]/.test(value)) throw new Error("Invalid setup endpoint.")
+  return endpoint.toString()
+}
+
 function printClaudeSetup(flags: Map<string, string | true>) {
-  const endpoint = readEndpoint(flags)
+  const endpoint = readSafeSetupEndpoint(flags)
   process.stdout.write(
     [
       "Desk Rules MCP Claude setup",
       "",
-      "Run:",
-      `claude mcp add --transport http desk-rules-mcp ${endpoint}`,
+      "Run in PowerShell or a POSIX shell:",
+      `claude mcp add --transport http desk-rules-mcp '${endpoint}'`,
       "",
       "Then use Claude's MCP connection flow to authenticate Desk Rules MCP.",
       "Compatible clients negotiate modern MCP automatically with stateless legacy fallback.",
@@ -836,7 +875,9 @@ function readPackageRootPath() {
 function printSkillsList() {
   const packageRoot = readPackageRootPath()
   process.stdout.write("Desk Rules bundled skills\n")
-  process.stdout.write(`Package: ${DESK_RULES_MCP_SERVER_MANIFEST.cli.npmPackageName}\n`)
+  process.stdout.write(
+    `Package: ${DESK_RULES_MCP_SERVER_MANIFEST.cli.npmPackageName}\n`,
+  )
   process.stdout.write(
     `MCP endpoint: ${DESK_RULES_MCP_SERVER_MANIFEST.canonicalEndpoint}\n`,
   )
@@ -860,6 +901,16 @@ function printHelp() {
       "Desk Rules CLI",
       "",
       "Commands:",
+      "  deskrules auth login [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules auth status [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules auth logout [--endpoint <url>] [--json]",
+      "  deskrules mcp capabilities [--operation <id,id,...>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules mcp call <tool> (--input <json>|--input-file <path>) [--output-file <path>|--output-directory <path>] [--overwrite] [--approve-write|--approve-external] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules media upload (--file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules brand upload (--kind <logo|font> --label <label> --file <path> --request-id <uuid>|--batch-file <path>) --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules studio reference upload --file <path> --request-id <uuid> --approve-write [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules feedback submit --summary <text> --report-file <path> --request-id <uuid> [--attachment-file <path>|--attachments-file <path>] --approve-write [--pathname <path>] [--endpoint <url>] [--timeout-ms <ms>] [--json]",
+      "  deskrules feedback status (--report-id <uuid>|--request-id <uuid>) [--endpoint <url>] [--timeout-ms <ms>] [--json]",
       "  deskrules mcp doctor [--client codex] [--config <path>] [--endpoint <url>] [--offline] [--json] [--cli-version <x>] [--plugin-version <x>] [--skills-version <x>]",
       "  deskrules mcp repair codex [--config <path>] [--profile <full|starter>] [--apply] [--json]",
       "  deskrules mcp setup codex [--endpoint <url>] [--profile <full|starter>]",
@@ -868,66 +919,85 @@ function printHelp() {
       "  deskrules skills list",
       "  deskrules help",
       "",
-      "The CLI diagnoses setup and update state. Design work still happens through Desk Rules MCP tools inside the authenticated agent.",
+      "Operational commands use the same authenticated Desk Rules MCP tools as connected agents.",
+      "Native preview images are written only when an explicit output path is supplied; existing files are preserved unless --overwrite is used for a single file.",
+      "Do not place credentials, authorization codes, or signed capability URLs in --input; use owner-scoped tool IDs and bounded JSON only.",
       `Agent setup prompt: ${PUBLIC_DOCS_ORIGIN}${PROMPT_DOCS_PATH}`,
       "",
     ].join("\n"),
   )
 }
 
-async function main() {
-  const argv = process.argv.slice(2)
-  if (
-    argv[0] === "mcp" &&
-    argv[1] === "repair" &&
-    argv[2] === "codex"
-  ) {
-    printCodexRepair(parseCodexRepairArgs(argv.slice(3)))
-    return
-  }
-  if (
-    argv[0] === "mcp" &&
-    argv[1] === "setup" &&
-    argv[2] === "codex"
-  ) {
-    printCodexSetup(parseCodexSetupArgs(argv.slice(3)))
-    return
-  }
+async function runOperationalCandidate(argv: readonly string[]) {
+  const operationalCandidate =
+    argv[0] === "auth" ||
+    (argv[0] === "media" && argv[1] === "upload") ||
+    (argv[0] === "brand" && argv[1] === "upload") ||
+    (argv[0] === "studio" && argv[1] === "reference" && argv[2] === "upload") ||
+    (argv[0] === "feedback" && ["status", "submit"].includes(argv[1] ?? "")) ||
+    (argv[0] === "mcp" && ["call", "capabilities"].includes(argv[1] ?? ""))
+  if (!operationalCandidate) return false
+  const { runOperationalCommand } = await import("./operational-cli.js")
+  return runOperationalCommand(argv)
+}
 
+function runCodexSetupOrRepair(argv: readonly string[]) {
+  if (argv[0] === "mcp" && argv[1] === "repair" && argv[2] === "codex") {
+    printCodexRepair(parseCodexRepairArgs(argv.slice(3)))
+    return true
+  }
+  if (argv[0] === "mcp" && argv[1] === "setup" && argv[2] === "codex") {
+    printCodexSetup(parseCodexSetupArgs(argv.slice(3)))
+    return true
+  }
+  return false
+}
+
+async function runParsedCommand(argv: readonly string[]) {
   const parsed = parseArgs(argv)
   const [first, second, third] = parsed.command
 
   if (!first || first === "help" || first === "--help" || first === "-h") {
     printHelp()
-    return
+    return true
   }
 
   if (first === "update") {
     printUpdateGuidance()
-    return
+    return true
   }
 
   if (first === "skills" && second === "list") {
     printSkillsList()
-    return
+    return true
   }
 
   if (first === "mcp" && second === "doctor") {
     await printDoctor(parsed.flags)
-    return
+    return true
   }
 
   if (first === "mcp" && second === "setup" && third === "claude") {
     printClaudeSetup(parsed.flags)
-    return
+    return true
   }
 
-  process.stderr.write(`Unknown command: ${parsed.command.join(" ")}\n\n`)
+  process.stderr.write("Unknown command.\n\n")
   printHelp()
   process.exitCode = 1
+  return true
+}
+
+async function main() {
+  const argv = process.argv.slice(2)
+  if (await runOperationalCandidate(argv)) return
+  if (runCodexSetupOrRepair(argv)) return
+  await runParsedCommand(argv)
 }
 
 main().catch((error: unknown) => {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
+  process.stderr.write(
+    `${error instanceof Error ? error.message : String(error)}\n`,
+  )
   process.exitCode = 1
 })
