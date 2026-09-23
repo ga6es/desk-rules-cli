@@ -106,7 +106,7 @@
     },
     {
       "path": "package/src/image-files.ts",
-      "sha256": "6106646669ba53dc043e8eaf65ea48dc9fb6ab1ad74cd948e44eda8ec539dd29"
+      "sha256": "841f984d1694cf9dff62e883fa5bd239e94f1a8db5c1716b220fa5c1b21b752c"
     },
     {
       "path": "package/src/index.ts",
@@ -170,7 +170,7 @@
     },
     {
       "path": "tests/cli.test.ts",
-      "sha256": "8c1cbd34bb84a6c19aec990058837dfc435854bc962338998ca207afcfc43560"
+      "sha256": "5748aec435c29679509a447affb528d108f32ba6a7802926d83457f44428e717"
     },
     {
       "path": "tests/deny-keyring-loader.mjs",
@@ -179,7 +179,7 @@
   ],
   "schemaVersion": 1,
   "source": {
-    "commit": "36fcd14df309fd060a4e3705b75c875f2a487ae9",
+    "commit": "f3de9235fdd6f31f3f77462e14ff98ccd9db5353",
     "repository": "ga6es/desk-rules",
     "root": "packages/cli"
   }

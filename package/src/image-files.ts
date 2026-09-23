@@ -163,13 +163,18 @@ function readWebpDimensions(bytes: Buffer) {
 
 function decodeCanonicalBase64(data: string) {
   const maxBase64Length = Math.ceil(MAX_IMAGE_BYTES / 3) * 4 + 4
-  const canonicalPattern =
-    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/u
-  if (data.length === 0 || data.length > maxBase64Length) {
+  if (data.length === 0 || data.length > maxBase64Length || data.length % 4 !== 0) {
     throw new CliImageFileError("image_payload_invalid")
   }
-  if (!canonicalPattern.test(data)) {
+  if (/[^A-Za-z0-9+/=]/u.test(data)) {
     throw new CliImageFileError("image_payload_invalid")
+  }
+  const paddingStart = data.indexOf("=")
+  if (paddingStart !== -1) {
+    const paddingLength = data.length - paddingStart
+    if (paddingLength > 2 || data.slice(paddingStart) !== "=".repeat(paddingLength)) {
+      throw new CliImageFileError("image_payload_invalid")
+    }
   }
   const bytes = Buffer.from(data, "base64")
   if (
